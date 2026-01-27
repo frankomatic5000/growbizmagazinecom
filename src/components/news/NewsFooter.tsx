@@ -4,6 +4,10 @@ import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 const footerLinks = {
   institutional: [
     { name: "About Us", path: "/about" },
+    { name: "Mission", path: "/mission" },
+    { name: "Vision", path: "/vision" },
+    { name: "Editorial Principles", path: "/editorial-principles" },
+    { name: "Values", path: "/values" },
     { name: "Contact", path: "/contact" },
   ],
   categories: [
