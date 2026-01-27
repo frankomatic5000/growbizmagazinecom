@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_verification_codes: {
+        Row: {
+          code: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           author: string
@@ -122,6 +152,7 @@ export type Database = {
     }
     Functions: {
       bootstrap_first_admin: { Args: never; Returns: boolean }
+      cleanup_expired_verification_codes: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
