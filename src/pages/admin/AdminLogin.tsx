@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Shield, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import MFAEnroll from '@/components/admin/MFAEnroll';
+import MFAVerify from '@/components/admin/MFAVerify';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -18,8 +20,18 @@ const emailSchema = z.object({
   email: z.string().email('Email inválido'),
 });
 
+type AuthStep = 'login' | 'mfa-enroll' | 'mfa-verify';
+
 export default function AdminLogin() {
-  const { signIn, signUp, user, isAdmin, isLoading: authLoading } = useAuth();
+  const { 
+    signIn, 
+    signUp, 
+    user, 
+    isAdmin, 
+    isLoading: authLoading,
+    mfaStatus,
+    refreshMFAStatus
+  } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,13 +39,23 @@ export default function AdminLogin() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
+  const [authStep, setAuthStep] = useState<AuthStep>('login');
 
-  // Redirect if already authenticated and is admin
+  // Handle auth flow after login
   useEffect(() => {
     if (!authLoading && user && isAdmin) {
-      navigate('/secure-content-editor-2026');
+      if (mfaStatus === 'none') {
+        // Admin has no MFA configured - show enrollment
+        setAuthStep('mfa-enroll');
+      } else if (mfaStatus === 'enrolled') {
+        // MFA configured but not verified this session
+        setAuthStep('mfa-verify');
+      } else if (mfaStatus === 'verified') {
+        // MFA verified - allow access
+        navigate('/secure-content-editor-2026');
+      }
     }
-  }, [user, isAdmin, authLoading, navigate]);
+  }, [user, isAdmin, authLoading, mfaStatus, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +63,6 @@ export default function AdminLogin() {
     setSuccessMessage('');
 
     if (mode === 'forgot') {
-      // Validate email only
       const validation = emailSchema.safeParse({ email });
       if (!validation.success) {
         setError(validation.error.errors[0].message);
@@ -72,7 +93,6 @@ export default function AdminLogin() {
       return;
     }
 
-    // Validate input for login/signup
     const validation = loginSchema.safeParse({ email, password });
     if (!validation.success) {
       setError(validation.error.errors[0].message);
@@ -83,7 +103,6 @@ export default function AdminLogin() {
 
     try {
       if (mode === 'signup') {
-        // Sign up new user
         const { error: signUpError } = await signUp(email, password);
         
         if (signUpError) {
@@ -102,7 +121,6 @@ export default function AdminLogin() {
         return;
       }
 
-      // Regular sign in
       const { error: signInError } = await signIn(email, password);
 
       if (signInError) {
@@ -114,7 +132,7 @@ export default function AdminLogin() {
         return;
       }
 
-      navigate('/secure-content-editor-2026');
+      // After successful login, the useEffect will handle the MFA flow
     } catch (err) {
       setError('Ocorreu um erro. Tente novamente.');
     } finally {
@@ -122,10 +140,55 @@ export default function AdminLogin() {
     }
   };
 
+  const handleMFAEnrollComplete = async () => {
+    await refreshMFAStatus();
+    navigate('/secure-content-editor-2026');
+  };
+
+  const handleMFAVerifyComplete = async () => {
+    await refreshMFAStatus();
+    navigate('/secure-content-editor-2026');
+  };
+
+  const handleMFASkip = () => {
+    navigate('/secure-content-editor-2026');
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Show MFA enrollment screen
+  if (authStep === 'mfa-enroll' && user && isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted p-4">
+        <div className="w-full max-w-md">
+          <div className="admin-card">
+            <MFAEnroll 
+              onEnrollComplete={handleMFAEnrollComplete} 
+              onSkip={handleMFASkip}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show MFA verification screen
+  if (authStep === 'mfa-verify' && user && isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted p-4">
+        <div className="w-full max-w-md">
+          <div className="admin-card">
+            <MFAVerify 
+              onVerifyComplete={handleMFAVerifyComplete}
+            />
+          </div>
+        </div>
       </div>
     );
   }
