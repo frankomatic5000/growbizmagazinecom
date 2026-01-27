@@ -1,278 +1,278 @@
-import CenteredContent from "@/components/CenteredContent";
-import Header from "@/components/Header";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Phone, Mail, MessageCircle, Send } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import NewsHeader from "@/components/news/NewsHeader";
+import NewsFooter from "@/components/news/NewsFooter";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
+  email: z.string().email("Email inválido").max(255),
+  phone: z.string().max(20).optional(),
+  message: z.string().min(10, "Mensagem deve ter pelo menos 10 caracteres").max(2000),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    name: "",
-    subject: "",
-    message: "",
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      message: "",
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
-  };
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from("contact_messages").insert({
+        name: data.name,
+        email: data.email,
+        phone: data.phone || null,
+        message: data.message,
+      });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+      if (error) throw error;
+
+      toast({
+        title: "Mensagem enviada!",
+        description: "Obrigado pelo seu contato. Responderemos em breve.",
+      });
+      form.reset();
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      toast({
+        title: "Erro ao enviar",
+        description: "Ocorreu um erro. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <NewsHeader />
 
       <main className="flex-grow">
-        <CenteredContent className="py-16 md:py-24">
-          <article className="prose prose-lg max-w-none">
-            {/* Title */}
-            <h1 className="font-display text-[4rem] md:text-[6rem] font-semibold leading-[1.1] mb-12">
-              Get in Touch
-            </h1>
-
-            {/* Intro */}
-            <div className="mb-16">
-              <p className="text-[1.8rem] md:text-[2rem] text-muted-foreground leading-relaxed">
-                Have a project in mind? Let's create something beautiful together.
+        {/* Hero Section */}
+        <section className="bg-primary/10 py-12 md:py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
+                Entre em Contato
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground">
+                Estamos aqui para ouvir você. Envie sua mensagem, sugestão ou dúvida.
               </p>
             </div>
+          </div>
+        </section>
 
-            {/* Contact Form */}
-            <form onSubmit={handleSubmit} className="mb-24">
-              <div className="space-y-8">
-                {/* Email */}
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-[1.4rem] font-medium text-foreground mb-3"
-                  >
-                    Your Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-6 py-4 text-[1.6rem] border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  />
-                </div>
-
-                {/* Name */}
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-[1.4rem] font-medium text-foreground mb-3"
-                  >
-                    Your Real Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-6 py-4 text-[1.6rem] border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  />
-                </div>
-
-                {/* Subject */}
-                <div>
-                  <label
-                    htmlFor="subject"
-                    className="block text-[1.4rem] font-medium text-foreground mb-3"
-                  >
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-6 py-4 text-[1.6rem] border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  />
-                </div>
-
-                {/* Message */}
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-[1.4rem] font-medium text-foreground mb-3"
-                  >
-                    Your Message:
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={12}
-                    className="w-full px-6 py-4 text-[1.6rem] border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-y"
-                  />
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-center pt-8">
-                  <button
-                    type="submit"
-                    className="px-12 py-4 text-[1.6rem] font-medium bg-foreground text-background hover:bg-primary hover:text-background transition-all duration-300 rounded-lg"
-                  >
-                    Send Now
-                  </button>
-                </div>
-              </div>
-            </form>
-
-            {/* FAQ Section */}
-            <div className="text-[1.6rem] leading-relaxed">
-              <h2 className="font-display text-[2.4rem] md:text-[3rem] font-semibold mb-8">
-                Frequently Asked Questions
-              </h2>
-
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="font-display text-[2rem] md:text-[2.4rem] font-semibold text-left">
-                    For Project Inquiries
-                  </AccordionTrigger>
-                  <AccordionContent className="text-[1.6rem] leading-relaxed">
-                    <p className="text-muted-foreground mb-4">
-                      I'm always excited to discuss new projects, collaborations, and creative opportunities.
-                      Whether you're a brand looking for editorial photography, a magazine planning a shoot,
-                      or a creative director with a vision, I'd love to hear from you.
-                    </p>
-                    <p className="text-foreground">
-                      <a
-                        href="mailto:hello@voyager.com"
-                        className="underline underline-offset-4 decoration-2 hover:text-primary transition-colors"
-                      >
-                        hello@voyager.com
-                      </a>
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="font-display text-[2rem] md:text-[2.4rem] font-semibold text-left">
-                    Booking Information
-                  </AccordionTrigger>
-                  <AccordionContent className="text-[1.6rem] leading-relaxed">
-                    <p className="text-muted-foreground mb-4">
-                      When reaching out, please include:
-                    </p>
-                    <ul className="list-disc pl-8 space-y-2 text-muted-foreground">
-                      <li>Project details and creative vision</li>
-                      <li>Desired timeline and shoot dates</li>
-                      <li>Budget range</li>
-                      <li>Location (studio or on-location)</li>
-                      <li>Any reference images or mood boards</li>
-                    </ul>
-                    <p className="text-muted-foreground mt-4">
-                      I'm typically booked 2-3 months in advance, but I always try to accommodate
-                      compelling projects with tighter timelines.
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="font-display text-[2rem] md:text-[2.4rem] font-semibold text-left">
-                    Press & Features
-                  </AccordionTrigger>
-                  <AccordionContent className="text-[1.6rem] leading-relaxed">
-                    <p className="text-muted-foreground mb-4">
-                      For press inquiries, interview requests, or speaking engagements, please contact:
-                    </p>
-                    <p className="text-foreground">
-                      <a
-                        href="mailto:press@voyager.com"
-                        className="underline underline-offset-4 decoration-2 hover:text-primary transition-colors"
-                      >
-                        press@voyager.com
-                      </a>
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-4">
-                  <AccordionTrigger className="font-display text-[2rem] md:text-[2.4rem] font-semibold text-left">
-                    Social
-                  </AccordionTrigger>
-                  <AccordionContent className="text-[1.6rem] leading-relaxed">
-                    <p className="text-muted-foreground mb-4">
-                      Follow along for behind-the-scenes moments, recent work, and creative inspiration:
-                    </p>
-                    <div className="flex flex-col gap-2">
-                      <a
-                        href="https://instagram.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground underline underline-offset-4 decoration-2 hover:text-primary transition-colors"
-                      >
-                        Instagram
-                      </a>
-                      <a
-                        href="https://twitter.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground underline underline-offset-4 decoration-2 hover:text-primary transition-colors"
-                      >
-                        Twitter
-                      </a>
-                      <a
-                        href="https://linkedin.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground underline underline-offset-4 decoration-2 hover:text-primary transition-colors"
-                      >
-                        LinkedIn
-                      </a>
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Contact Info Cards */}
+              <div className="space-y-6">
+                <Card className="border-border/50 hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                      <Phone className="h-6 w-6 text-primary" />
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-5">
-                  <AccordionTrigger className="font-display text-[2rem] md:text-[2.4rem] font-semibold text-left">
-                    Studio Location
-                  </AccordionTrigger>
-                  <AccordionContent className="text-[1.6rem] leading-relaxed">
-                    <p className="text-muted-foreground">
-                      Based in Vesterbro, Copenhagen, Denmark
-                      <br />
-                      Available for projects worldwide
+                    <CardTitle className="font-display text-xl">Telefone</CardTitle>
+                    <CardDescription>Ligue para nós</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground font-medium">
+                      (XX) XXXX-XXXX
                     </p>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Segunda a Sexta, 9h às 18h
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-border/50 hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-2">
+                      <MessageCircle className="h-6 w-6 text-green-600" />
+                    </div>
+                    <CardTitle className="font-display text-xl">WhatsApp</CardTitle>
+                    <CardDescription>Mensagem rápida</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground font-medium">
+                      (XX) XXXXX-XXXX
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Respondemos em até 24h
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-border/50 hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-2">
+                      <Mail className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <CardTitle className="font-display text-xl">E-mail</CardTitle>
+                    <CardDescription>Envie um e-mail</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground font-medium">
+                      contato@growbiz.com
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Para parcerias e imprensa
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Contact Form */}
+              <div className="lg:col-span-2">
+                <Card className="border-border/50">
+                  <CardHeader>
+                    <CardTitle className="font-display text-2xl">
+                      Envie sua mensagem
+                    </CardTitle>
+                    <CardDescription>
+                      Preencha o formulário abaixo e entraremos em contato o mais breve possível.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Nome completo *</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="Seu nome" 
+                                    {...field} 
+                                    className="bg-background"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>E-mail *</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="email" 
+                                    placeholder="seu@email.com" 
+                                    {...field}
+                                    className="bg-background"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Telefone (opcional)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="tel" 
+                                  placeholder="(XX) XXXXX-XXXX" 
+                                  {...field}
+                                  className="bg-background"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="message"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Mensagem *</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder="Escreva sua mensagem aqui..."
+                                  rows={6}
+                                  {...field}
+                                  className="bg-background resize-y"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <Button 
+                          type="submit" 
+                          size="lg"
+                          disabled={isSubmitting}
+                          className="w-full md:w-auto"
+                        >
+                          {isSubmitting ? (
+                            "Enviando..."
+                          ) : (
+                            <>
+                              <Send className="h-4 w-4 mr-2" />
+                              Enviar Mensagem
+                            </>
+                          )}
+                        </Button>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </article>
-        </CenteredContent>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border mt-12">
-        <div className="article-grid py-12">
-          <div className="article-hero text-center text-sm text-muted-foreground">
-            <p>© 2024 Voyager Press. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <NewsFooter />
     </div>
   );
 };

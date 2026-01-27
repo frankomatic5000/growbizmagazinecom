@@ -12,6 +12,7 @@ import {
   Newspaper,
   Loader2,
   LayoutDashboard,
+  Mail,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useArticles } from '@/hooks/useArticles';
@@ -27,7 +28,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminUserManager } from '@/components/admin/AdminUserManager';
+import AdminContactMessages from '@/components/admin/AdminContactMessages';
 import { toast } from 'sonner';
 
 const categoryLabels: Record<string, string> = {
@@ -172,190 +175,209 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="admin-card">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Newspaper className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total de Artigos</p>
-                <p className="text-2xl font-bold">{articles.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="admin-card">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <Eye className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Publicados</p>
-                <p className="text-2xl font-bold">
-                  {articles.filter((a) => a.is_published).length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="admin-card">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-                <EyeOff className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Rascunhos</p>
-                <p className="text-2xl font-bold">
-                  {articles.filter((a) => !a.is_published).length}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Tabs defaultValue="articles" className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="articles" className="flex items-center gap-2">
+              <Newspaper className="h-4 w-4" />
+              Artigos
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Mensagens
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Gerenciar Artigos</h2>
-          <Link to="/secure-content-editor-2026/novo">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Artigo
-            </Button>
-          </Link>
-        </div>
-
-        {/* Articles table */}
-        <div className="admin-card overflow-hidden">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <TabsContent value="articles" className="space-y-6">
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="admin-card">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Newspaper className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total de Artigos</p>
+                    <p className="text-2xl font-bold">{articles.length}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="admin-card">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                    <Eye className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Publicados</p>
+                    <p className="text-2xl font-bold">
+                      {articles.filter((a) => a.is_published).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="admin-card">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                    <EyeOff className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Rascunhos</p>
+                    <p className="text-2xl font-bold">
+                      {articles.filter((a) => !a.is_published).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          ) : articles.length === 0 ? (
-            <div className="text-center py-12">
-              <Newspaper className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
-                Nenhum artigo criado
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                Comece criando seu primeiro artigo.
-              </p>
+
+            {/* Actions */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Gerenciar Artigos</h2>
               <Link to="/secure-content-editor-2026/novo">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Criar Artigo
+                  Novo Artigo
                 </Button>
               </Link>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Título</th>
-                    <th>Categoria</th>
-                    <th>Autor</th>
-                    <th>Status</th>
-                    <th>Data</th>
-                    <th>Views</th>
-                    <th className="text-right">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {articles.map((article) => (
-                    <tr key={article.id}>
-                      <td>
-                        <div className="max-w-xs">
-                          <p className="font-medium truncate">{article.title}</p>
-                          {article.subtitle && (
-                            <p className="text-sm text-muted-foreground truncate">
-                              {article.subtitle}
-                            </p>
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <span className="text-sm">
-                          {categoryLabels[article.category] || article.category}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="text-sm">{article.author}</span>
-                      </td>
-                      <td>
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                            article.is_published
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-yellow-100 text-yellow-700'
-                          }`}
-                        >
-                          {article.is_published ? (
-                            <>
-                              <Eye className="h-3 w-3" />
-                              Publicado
-                            </>
-                          ) : (
-                            <>
-                              <EyeOff className="h-3 w-3" />
-                              Rascunho
-                            </>
-                          )}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="text-sm text-muted-foreground">
-                          {format(new Date(article.created_at), 'dd/MM/yyyy', {
-                            locale: ptBR,
-                          })}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="text-sm">{article.view_count}</span>
-                      </td>
-                      <td>
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => togglePublish(article)}
-                            title={
-                              article.is_published ? 'Despublicar' : 'Publicar'
-                            }
-                          >
-                            {article.is_published ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                          <Link
-                            to={`/secure-content-editor-2026/editar/${article.id}`}
-                          >
-                            <Button variant="ghost" size="icon" title="Editar">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setArticleToDelete(article.id);
-                              setDeleteDialogOpen(true);
-                            }}
-                            title="Excluir"
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+            {/* Articles table */}
+            <div className="admin-card overflow-hidden">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : articles.length === 0 ? (
+                <div className="text-center py-12">
+                  <Newspaper className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    Nenhum artigo criado
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Comece criando seu primeiro artigo.
+                  </p>
+                  <Link to="/secure-content-editor-2026/novo">
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Criar Artigo
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Título</th>
+                        <th>Categoria</th>
+                        <th>Autor</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Views</th>
+                        <th className="text-right">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {articles.map((article) => (
+                        <tr key={article.id}>
+                          <td>
+                            <div className="max-w-xs">
+                              <p className="font-medium truncate">{article.title}</p>
+                              {article.subtitle && (
+                                <p className="text-sm text-muted-foreground truncate">
+                                  {article.subtitle}
+                                </p>
+                              )}
+                            </div>
+                          </td>
+                          <td>
+                            <span className="text-sm">
+                              {categoryLabels[article.category] || article.category}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="text-sm">{article.author}</span>
+                          </td>
+                          <td>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                                article.is_published
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-yellow-100 text-yellow-700'
+                              }`}
+                            >
+                              {article.is_published ? (
+                                <>
+                                  <Eye className="h-3 w-3" />
+                                  Publicado
+                                </>
+                              ) : (
+                                <>
+                                  <EyeOff className="h-3 w-3" />
+                                  Rascunho
+                                </>
+                              )}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="text-sm text-muted-foreground">
+                              {format(new Date(article.created_at), 'dd/MM/yyyy', {
+                                locale: ptBR,
+                              })}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="text-sm">{article.view_count}</span>
+                          </td>
+                          <td>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => togglePublish(article)}
+                                title={
+                                  article.is_published ? 'Despublicar' : 'Publicar'
+                                }
+                              >
+                                {article.is_published ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                              <Link
+                                to={`/secure-content-editor-2026/editar/${article.id}`}
+                              >
+                                <Button variant="ghost" size="icon" title="Editar">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  setArticleToDelete(article.id);
+                                  setDeleteDialogOpen(true);
+                                }}
+                                title="Excluir"
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <AdminContactMessages />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Delete confirmation dialog */}
