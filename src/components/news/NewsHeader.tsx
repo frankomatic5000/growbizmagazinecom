@@ -55,11 +55,13 @@ export default function NewsHeader() {
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <img 
-              src="/assets/growbiz-logo.png" 
-              alt="GrowBiz - A Global Media of Virtues" 
-              className="h-12 md:h-16 w-auto"
-            />
+            {/* Container adicionado para centralizar o texto */}
+            <div className="flex flex-col items-center">
+              <h1 className="text-3xl md:text-4xl font-serif font-semibold text-foreground tracking-tight">GrowBiz</h1>
+              <span className="text-[10px] md:text-xs font-sans font-medium tracking-[0.2em] text-muted-foreground uppercase">
+                A Global Media of Virtues
+              </span>
+            </div>
           </Link>
 
           {/* Search bar - Desktop */}
