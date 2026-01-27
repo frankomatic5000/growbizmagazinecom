@@ -9,10 +9,10 @@ const footerLinks = {
     { name: "Trabalhe Conosco", path: "/carreiras" },
   ],
   categories: [
-    { name: "Notícias", path: "/categoria/news" },
-    { name: "Política", path: "/categoria/politics" },
-    { name: "Economia", path: "/categoria/economy" },
-    { name: "Esportes", path: "/categoria/sports" },
+    { name: "Culture & Arts", path: "/categoria/culture_arts" },
+    { name: "Education", path: "/categoria/education" },
+    { name: "Entrepreneurship & Business", path: "/categoria/entrepreneurship_business" },
+    { name: "Society & Humanity", path: "/categoria/society_humanity" },
   ],
   legal: [
     { name: "Política de Privacidade", path: "/privacy-policy" },
