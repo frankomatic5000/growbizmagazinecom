@@ -59,7 +59,7 @@ export default function NewsHeader() {
             <img 
               src={logoGrowbiz} 
               alt="GrowBiz - A Global Media of Virtues" 
-              className="h-12 md:h-16 w-auto"
+              className="h-16 md:h-20 w-auto"
             />
           </Link>
 
