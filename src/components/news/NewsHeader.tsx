@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -65,23 +65,35 @@ export default function NewsHeader() {
           </Link>
 
           {/* Search bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <Input
-                type="search"
-                placeholder="Buscar notícias..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-10"
-              />
-              <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full">
-                <Search className="h-4 w-4" />
+          <div className="hidden md:flex items-center flex-1 max-w-md mx-4 gap-2">
+            <Link to="/">
+              <Button variant="ghost" size="icon" className="shrink-0">
+                <Home className="h-5 w-5" />
               </Button>
-            </div>
-          </form>
+            </Link>
+            <form onSubmit={handleSearch} className="flex-1">
+              <div className="relative w-full">
+                <Input
+                  type="search"
+                  placeholder="Buscar notícias..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pr-10"
+                />
+                <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full">
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+            </form>
+          </div>
 
           {/* Mobile controls */}
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-1 md:hidden">
+            <Link to="/">
+              <Button variant="ghost" size="icon">
+                <Home className="h-5 w-5" />
+              </Button>
+            </Link>
             <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)}>
               <Search className="h-5 w-5" />
             </Button>
