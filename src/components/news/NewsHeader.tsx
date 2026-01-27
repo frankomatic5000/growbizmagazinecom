@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, Menu, X, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import logoGrowbiz from "@/assets/logo-growbiz.jpg";
 
 const categories = [
   { name: "Culture & Arts", path: "/category/culture_arts" },
@@ -33,12 +34,12 @@ export default function NewsHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-black border-b border-white/10 shadow-sm">
       {/* Top bar */}
-      <div className="bg-secondary text-secondary-foreground">
+      <div className="bg-black/90">
         <div className="news-container py-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
+            <span className="text-white/60">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -51,23 +52,21 @@ export default function NewsHeader() {
       </div>
 
       {/* Main header */}
-      <div className="news-container py-4">
+      <div className="news-container py-4 bg-black">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            {/* Container adicionado para centralizar o texto */}
-            <div className="flex flex-col items-center">
-              <h1 className="text-3xl md:text-4xl font-serif font-semibold text-foreground tracking-tight">GrowBiz</h1>
-              <span className="text-[10px] md:text-xs font-sans font-medium tracking-[0.2em] text-muted-foreground uppercase">
-                A Global Media of Virtues
-              </span>
-            </div>
+            <img 
+              src={logoGrowbiz} 
+              alt="GrowBiz - A Global Media of Virtues" 
+              className="h-12 md:h-16 w-auto"
+            />
           </Link>
 
           {/* Search bar - Desktop */}
           <div className="hidden md:flex items-center flex-1 max-w-md mx-4 gap-2">
             <Link to="/">
-              <Button variant="ghost" size="icon" className="shrink-0">
+              <Button variant="ghost" size="icon" className="shrink-0 text-white hover:text-white hover:bg-white/10">
                 <Home className="h-5 w-5" />
               </Button>
             </Link>
@@ -78,9 +77,9 @@ export default function NewsHeader() {
                   placeholder="Search articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pr-10"
+                  className="w-full pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
                 />
-                <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full">
+                <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full text-white hover:text-white hover:bg-transparent">
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
@@ -90,14 +89,14 @@ export default function NewsHeader() {
           {/* Mobile controls */}
           <div className="flex items-center gap-1 md:hidden">
             <Link to="/">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white hover:text-white hover:bg-white/10">
                 <Home className="h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-white hover:text-white hover:bg-white/10">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white hover:text-white hover:bg-white/10">
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -112,10 +111,10 @@ export default function NewsHeader() {
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-10"
+                className="w-full pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
                 autoFocus
               />
-              <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full">
+              <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full text-white hover:text-white hover:bg-transparent">
                 <Search className="h-4 w-4" />
               </Button>
             </div>
@@ -124,7 +123,7 @@ export default function NewsHeader() {
       </div>
 
       {/* Navigation */}
-      <nav className="border-t border-border bg-card">
+      <nav className="border-t border-white/10 bg-black">
         <div className="news-container">
           {/* Desktop nav */}
           <ul className="hidden md:flex items-center gap-1 py-2 overflow-x-auto">
@@ -132,7 +131,7 @@ export default function NewsHeader() {
               <li key={category.path}>
                 <Link
                   to={category.path}
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-muted rounded transition-colors whitespace-nowrap"
+                  className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 rounded transition-colors whitespace-nowrap"
                 >
                   {category.name}
                 </Link>
@@ -148,7 +147,7 @@ export default function NewsHeader() {
                   <Link
                     to={category.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className="block px-4 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded transition-colors"
+                    className="block px-4 py-3 text-base font-medium text-white hover:text-white hover:bg-white/10 rounded transition-colors"
                   >
                     {category.name}
                   </Link>
