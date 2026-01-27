@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Instagram } from "lucide-react";
 
 const footerLinks = {
   institutional: [
@@ -22,10 +22,7 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { name: "Facebook", icon: Facebook, url: "#" },
-  { name: "Twitter", icon: Twitter, url: "#" },
-  { name: "Instagram", icon: Instagram, url: "#" },
-  { name: "Youtube", icon: Youtube, url: "#" },
+  { name: "Instagram", icon: Instagram, url: "https://instagram.com/growbizmagazine" },
 ];
 
 export default function NewsFooter() {
