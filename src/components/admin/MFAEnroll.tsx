@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -156,7 +155,7 @@ export default function MFAEnroll({ onEnrollComplete, onSkip }: MFAEnrollProps) 
 
       <div className="flex justify-center">
         <div className="bg-white p-4 rounded-lg">
-          <QRCodeSVG value={qrCode} size={180} />
+          <img src={qrCode} alt="QR Code para autenticador" width={180} height={180} />
         </div>
       </div>
 
