@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import {
   Plus,
   Edit,
@@ -34,19 +34,22 @@ import AdminContactMessages from '@/components/admin/AdminContactMessages';
 import { toast } from 'sonner';
 
 const categoryLabels: Record<string, string> = {
-  news: 'Notícias',
-  politics: 'Política',
-  economy: 'Economia',
-  sports: 'Esportes',
-  entertainment: 'Entretenimento',
-  technology: 'Tecnologia',
-  opinion: 'Opinião',
+  culture_arts: 'Culture & Arts',
+  education: 'Education',
+  entrepreneurship_business: 'Entrepreneurship & Business',
+  society_humanity: 'Society & Humanity',
+  psychology_wellbeing: 'Psychology & Well-Being',
+  sustainability_future: 'Sustainability & Future',
+  lifestyle_purpose: 'Lifestyle with Purpose',
+  events: 'Events',
+  opinion_essays: 'Opinion & Essays',
+  biographies: 'Biographies',
 };
 
 export default function AdminDashboard() {
   const { user, isAdmin, isLoading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
-  const { fetchArticles, deleteArticle, updateArticle } = useArticles();
+  const { deleteArticle, updateArticle } = useArticles();
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -62,7 +65,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     // After auth+role are resolved, block non-admins
     if (!authLoading && user && !isAdmin) {
-      toast.error('Acesso negado. Você não tem permissão de administrador.');
+      toast.error('Access denied. You do not have admin permissions.');
       signOut();
       navigate('/secure-content-editor-2026/login');
     }
@@ -87,7 +90,7 @@ export default function AdminDashboard() {
         setArticles(data || []);
       } catch (err) {
         console.error('Error loading articles:', err);
-        toast.error('Erro ao carregar artigos');
+        toast.error('Error loading articles');
       } finally {
         setIsLoading(false);
       }
@@ -104,9 +107,9 @@ export default function AdminDashboard() {
     try {
       await deleteArticle(articleToDelete);
       setArticles((prev) => prev.filter((a) => a.id !== articleToDelete));
-      toast.success('Artigo excluído com sucesso');
+      toast.success('Article deleted successfully');
     } catch (err) {
-      toast.error('Erro ao excluir artigo');
+      toast.error('Error deleting article');
     } finally {
       setDeleteDialogOpen(false);
       setArticleToDelete(null);
@@ -122,10 +125,10 @@ export default function AdminDashboard() {
         )
       );
       toast.success(
-        article.is_published ? 'Artigo despublicado' : 'Artigo publicado'
+        article.is_published ? 'Article unpublished' : 'Article published'
       );
     } catch (err) {
-      toast.error('Erro ao atualizar artigo');
+      toast.error('Error updating article');
     }
   };
 
@@ -159,7 +162,7 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <LayoutDashboard className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">Painel Administrativo</h1>
+            <h1 className="text-xl font-bold">Admin Panel</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground hidden md:block">
@@ -168,7 +171,7 @@ export default function AdminDashboard() {
             <AdminUserManager />
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
-              Sair
+              Logout
             </Button>
           </div>
         </div>
@@ -179,11 +182,11 @@ export default function AdminDashboard() {
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="articles" className="flex items-center gap-2">
               <Newspaper className="h-4 w-4" />
-              Artigos
+              Articles
             </TabsTrigger>
             <TabsTrigger value="messages" className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
-              Mensagens
+              Messages
             </TabsTrigger>
           </TabsList>
 
@@ -196,7 +199,7 @@ export default function AdminDashboard() {
                     <Newspaper className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total de Artigos</p>
+                    <p className="text-sm text-muted-foreground">Total Articles</p>
                     <p className="text-2xl font-bold">{articles.length}</p>
                   </div>
                 </div>
@@ -207,7 +210,7 @@ export default function AdminDashboard() {
                     <Eye className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Publicados</p>
+                    <p className="text-sm text-muted-foreground">Published</p>
                     <p className="text-2xl font-bold">
                       {articles.filter((a) => a.is_published).length}
                     </p>
@@ -220,7 +223,7 @@ export default function AdminDashboard() {
                     <EyeOff className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Rascunhos</p>
+                    <p className="text-sm text-muted-foreground">Drafts</p>
                     <p className="text-2xl font-bold">
                       {articles.filter((a) => !a.is_published).length}
                     </p>
@@ -231,11 +234,11 @@ export default function AdminDashboard() {
 
             {/* Actions */}
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Gerenciar Artigos</h2>
+              <h2 className="text-xl font-semibold">Manage Articles</h2>
               <Link to="/secure-content-editor-2026/novo">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Novo Artigo
+                  New Article
                 </Button>
               </Link>
             </div>
@@ -250,15 +253,15 @@ export default function AdminDashboard() {
                 <div className="text-center py-12">
                   <Newspaper className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
-                    Nenhum artigo criado
+                    No articles created
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    Comece criando seu primeiro artigo.
+                    Start by creating your first article.
                   </p>
                   <Link to="/secure-content-editor-2026/novo">
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
-                      Criar Artigo
+                      Create Article
                     </Button>
                   </Link>
                 </div>
@@ -267,13 +270,13 @@ export default function AdminDashboard() {
                   <table className="admin-table">
                     <thead>
                       <tr>
-                        <th>Título</th>
-                        <th>Categoria</th>
-                        <th>Autor</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Author</th>
                         <th>Status</th>
-                        <th>Data</th>
+                        <th>Date</th>
                         <th>Views</th>
-                        <th className="text-right">Ações</th>
+                        <th className="text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -308,20 +311,20 @@ export default function AdminDashboard() {
                               {article.is_published ? (
                                 <>
                                   <Eye className="h-3 w-3" />
-                                  Publicado
+                                  Published
                                 </>
                               ) : (
                                 <>
                                   <EyeOff className="h-3 w-3" />
-                                  Rascunho
+                                  Draft
                                 </>
                               )}
                             </span>
                           </td>
                           <td>
                             <span className="text-sm text-muted-foreground">
-                              {format(new Date(article.created_at), 'dd/MM/yyyy', {
-                                locale: ptBR,
+                              {format(new Date(article.created_at), 'MM/dd/yyyy', {
+                                locale: enUS,
                               })}
                             </span>
                           </td>
@@ -335,7 +338,7 @@ export default function AdminDashboard() {
                                 size="icon"
                                 onClick={() => togglePublish(article)}
                                 title={
-                                  article.is_published ? 'Despublicar' : 'Publicar'
+                                  article.is_published ? 'Unpublish' : 'Publish'
                                 }
                               >
                                 {article.is_published ? (
@@ -347,7 +350,7 @@ export default function AdminDashboard() {
                               <Link
                                 to={`/secure-content-editor-2026/editar/${article.id}`}
                               >
-                                <Button variant="ghost" size="icon" title="Editar">
+                                <Button variant="ghost" size="icon" title="Edit">
                                   <Edit className="h-4 w-4" />
                                 </Button>
                               </Link>
@@ -358,7 +361,7 @@ export default function AdminDashboard() {
                                   setArticleToDelete(article.id);
                                   setDeleteDialogOpen(true);
                                 }}
-                                title="Excluir"
+                                title="Delete"
                                 className="text-destructive hover:text-destructive"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -384,19 +387,19 @@ export default function AdminDashboard() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir artigo?</AlertDialogTitle>
+            <AlertDialogTitle>Delete article?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O artigo será permanentemente
-              excluído.
+              This action cannot be undone. The article will be permanently
+              deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Excluir
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

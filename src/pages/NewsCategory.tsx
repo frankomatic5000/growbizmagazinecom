@@ -40,7 +40,7 @@ export default function NewsCategory() {
     loadArticles();
   }, [category]);
 
-  const categoryName = category ? categoryLabels[category] || category : 'Categoria';
+  const categoryName = category ? categoryLabels[category] || category : 'Category';
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,8 +63,8 @@ export default function NewsCategory() {
           </div>
         ) : articles.length === 0 ? (
           <EmptyState
-            title={`Nenhuma notícia em ${categoryName}`}
-            description={`Ainda não há notícias publicadas nesta categoria. Volte em breve!`}
+            title={`No articles in ${categoryName}`}
+            description={`No articles have been published in this category yet. Check back soon!`}
           />
         ) : (
           <div className="news-grid-main">

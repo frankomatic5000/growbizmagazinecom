@@ -5,16 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const categories = [
-  { name: "Culture & Arts", path: "/categoria/culture_arts" },
-  { name: "Education", path: "/categoria/education" },
-  { name: "Entrepreneurship & Business", path: "/categoria/entrepreneurship_business" },
-  { name: "Society & Humanity", path: "/categoria/society_humanity" },
-  { name: "Psychology & Well-Being", path: "/categoria/psychology_wellbeing" },
-  { name: "Sustainability & Future", path: "/categoria/sustainability_future" },
-  { name: "Lifestyle with Purpose", path: "/categoria/lifestyle_purpose" },
-  { name: "Events", path: "/categoria/events" },
-  { name: "Opinion & Essays", path: "/categoria/opinion_essays" },
-  { name: "Biographies", path: "/categoria/biographies" },
+  { name: "Culture & Arts", path: "/category/culture_arts" },
+  { name: "Education", path: "/category/education" },
+  { name: "Entrepreneurship & Business", path: "/category/entrepreneurship_business" },
+  { name: "Society & Humanity", path: "/category/society_humanity" },
+  { name: "Psychology & Well-Being", path: "/category/psychology_wellbeing" },
+  { name: "Sustainability & Future", path: "/category/sustainability_future" },
+  { name: "Lifestyle with Purpose", path: "/category/lifestyle_purpose" },
+  { name: "Events", path: "/category/events" },
+  { name: "Opinion & Essays", path: "/category/opinion_essays" },
+  { name: "Biographies", path: "/category/biographies" },
 ];
 
 export default function NewsHeader() {
@@ -26,7 +26,7 @@ export default function NewsHeader() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/busca?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setIsSearchOpen(false);
     }
@@ -39,7 +39,7 @@ export default function NewsHeader() {
         <div className="news-container py-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              {new Date().toLocaleDateString("pt-BR", {
+              {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
@@ -75,7 +75,7 @@ export default function NewsHeader() {
               <div className="relative w-full">
                 <Input
                   type="search"
-                  placeholder="Buscar notícias..."
+                  placeholder="Search articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pr-10"
@@ -109,7 +109,7 @@ export default function NewsHeader() {
             <div className="relative">
               <Input
                 type="search"
-                placeholder="Buscar notícias..."
+                placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pr-10"

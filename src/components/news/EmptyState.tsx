@@ -6,8 +6,8 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({
-  title = 'Nenhuma notícia encontrada',
-  description = 'Ainda não há notícias publicadas. Volte em breve para conferir as últimas atualizações.',
+  title = 'No articles found',
+  description = 'No articles have been published yet. Check back soon for the latest updates.',
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
