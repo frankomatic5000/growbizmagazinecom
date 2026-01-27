@@ -26,6 +26,19 @@ export default function MFAEnroll({ onEnrollComplete, onSkip }: MFAEnrollProps) 
     setError('');
 
     try {
+      // First, check for and remove any existing unverified factors
+      const { data: factorsData } = await supabase.auth.mfa.listFactors();
+      
+      if (factorsData) {
+        const unverifiedFactors = factorsData.totp.filter(f => f.status !== 'verified');
+        
+        // Remove all unverified factors
+        for (const factor of unverifiedFactors) {
+          await supabase.auth.mfa.unenroll({ factorId: factor.id });
+        }
+      }
+
+      // Now enroll with a fresh factor
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
         friendlyName: 'Autenticador Admin',
