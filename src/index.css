@@ -2,152 +2,110 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* UOL-inspired News Portal Design System */
 
 @layer base {
   :root {
-    --background: 220 20% 3%;
-    --foreground: 0 0% 98%;
+    /* Core palette - Neutral with vibrant accent */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 8%;
 
-    --card: 220 20% 5%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
 
-    --popover: 220 20% 5%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
 
-    /* Lifestyle gradient theme - Blue to Pink to Orange */
-    --primary: 217 100% 65%; /* #4E93FF */
+    /* Primary - News Red Accent */
+    --primary: 0 85% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --primary-light: 215 86% 70%; /* #639CF2 */
-    --primary-glow: 195 100% 94%; /* #E4F9FF */
-
-    --secondary: 320 98% 74%; /* #FF7EEA */
+    /* Secondary - Dark Gray */
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 27 100% 55%; /* #F38300 */
+    /* Accent - Blue for links/highlights */
+    --accent: 210 100% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --accent-red: 356 100% 56%; /* #F3DDID approximation */
-
-    --muted: 220 20% 12%;
-    --muted-foreground: 0 0% 60%; /* #999 */
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 45%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 15%;
-    --input: 220 20% 15%;
-    --ring: 217 100% 65%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 0 85% 50%;
 
-    --radius: 1.2rem;
+    --radius: 0.5rem;
 
-    /* Lifestyle editorial tokens */
-    --editorial-text: 0 0% 98%;
-    --editorial-text-light: 220 15% 65%;
-    --editorial-tag: 217 100% 70%;
-    --editorial-tag-bg: 220 20% 12%;
-    --editorial-hover: 220 20% 8%;
-
-    /* Gradient definitions - Orange to Blue inspired */
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(27 100% 55%),
-      hsl(217 100% 65%)
-    );
-    --gradient-hero: linear-gradient(
-      135deg,
-      hsl(27 100% 55%) 0%,
-      hsl(14 100% 57%) 30%,
-      hsl(290 90% 60%) 60%,
-      hsl(217 100% 65%) 100%
-    );
-    --gradient-accent: linear-gradient(
-      90deg,
-      hsl(27 100% 55%),
-      hsl(14 100% 57%),
-      hsl(217 100% 65%)
-    );
+    /* News portal specific tokens */
+    --news-headline: 0 0% 8%;
+    --news-subhead: 0 0% 25%;
+    --news-meta: 0 0% 50%;
+    --news-divider: 0 0% 90%;
+    --news-highlight: 0 85% 50%;
+    --news-category-bg: 0 85% 50%;
+    --news-category-text: 0 0% 100%;
+    --news-sidebar-bg: 0 0% 96%;
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217 100% 65%;
+    --sidebar-foreground: 0 0% 8%;
+    --sidebar-primary: 0 85% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 8%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 0 85% 50%;
   }
 
   .dark {
-    --background: 220 20% 8%;
-    --foreground: 220 15% 95%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
 
-    --card: 220 20% 10%;
-    --card-foreground: 220 15% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 220 20% 10%;
-    --popover-foreground: 220 15% 95%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 217 100% 70%;
+    --primary: 0 85% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --primary-light: 215 86% 75%;
-    --primary-glow: 195 100% 30%;
+    --secondary: 0 0% 85%;
+    --secondary-foreground: 0 0% 8%;
 
-    --secondary: 320 98% 80%;
-    --secondary-foreground: 220 20% 10%;
-
-    --accent: 27 100% 60%;
+    --accent: 210 100% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --accent-red: 356 100% 60%;
-
-    --muted: 220 20% 15%;
-    --muted-foreground: 0 0% 60%; /* #999 */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
 
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 217 100% 70%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 85% 55%;
 
-    --editorial-text: 220 15% 92%;
-    --editorial-text-light: 220 15% 65%;
-    --editorial-tag: 217 100% 70%;
-    --editorial-tag-bg: 217 40% 20%;
-    --editorial-hover: 220 20% 12%;
+    --news-headline: 0 0% 95%;
+    --news-subhead: 0 0% 75%;
+    --news-meta: 0 0% 55%;
+    --news-divider: 0 0% 20%;
+    --news-highlight: 0 85% 55%;
+    --news-category-bg: 0 85% 55%;
+    --news-category-text: 0 0% 100%;
+    --news-sidebar-bg: 0 0% 10%;
 
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(27 100% 60%),
-      hsl(217 100% 70%)
-    );
-    --gradient-hero: linear-gradient(
-      135deg,
-      hsl(27 100% 60%) 0%,
-      hsl(14 100% 62%) 30%,
-      hsl(290 90% 65%) 60%,
-      hsl(217 100% 70%) 100%
-    );
-    --gradient-accent: linear-gradient(
-      90deg,
-      hsl(27 100% 60%),
-      hsl(14 100% 62%),
-      hsl(217 100% 70%)
-    );
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 217 100% 70%;
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 85% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217 100% 70%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 0 85% 55%;
   }
 }
 
@@ -161,23 +119,82 @@ All colors MUST be HSL.
     font-size: 1rem;
     -webkit-font-smoothing: antialiased;
     -moz-font-smoothing: antialiased;
-    -o-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    line-height: 2;
-  }
-
-  @media (min-width: 40em) {
-    body {
-      font-size: 1.125rem;
-    }
+    line-height: 1.6;
   }
 }
 
-/* Add the keyframes definition */
+/* Typography utilities */
+@layer components {
+  .news-headline {
+    @apply font-sans font-bold text-foreground leading-tight;
+  }
+
+  .news-headline-lg {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .news-headline-md {
+    @apply text-xl md:text-2xl;
+  }
+
+  .news-headline-sm {
+    @apply text-lg md:text-xl;
+  }
+
+  .news-subhead {
+    @apply font-sans text-muted-foreground leading-relaxed;
+  }
+
+  .news-meta {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .news-category {
+    @apply inline-block px-2 py-0.5 text-xs font-semibold uppercase tracking-wide bg-primary text-primary-foreground;
+  }
+
+  .news-card {
+    @apply bg-card border border-border hover:shadow-md transition-shadow duration-200;
+  }
+
+  .news-divider {
+    @apply border-t border-border;
+  }
+
+  .news-link {
+    @apply text-accent hover:underline transition-colors;
+  }
+}
+
+/* Grid layouts for news */
+@layer components {
+  .news-container {
+    @apply max-w-7xl mx-auto px-4 md:px-6 lg:px-8;
+  }
+
+  .news-grid {
+    @apply grid gap-4 md:gap-6;
+  }
+
+  .news-grid-main {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+  }
+
+  .news-grid-2col {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+
+  .news-sidebar {
+    @apply bg-muted/50 p-4 rounded-lg;
+  }
+}
+
+/* Animation utilities */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -185,163 +202,43 @@ All colors MUST be HSL.
   }
 }
 
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out;
+  }
+}
+
+/* Admin panel specific styles */
 @layer components {
-  .blog-feed__item {
-    opacity: 0;
-    transform: translateY(30px);
+  .admin-input {
+    @apply w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
   }
 
-  .blog-feed__item.animate-fadeInUp {
-    animation: fadeInUp 0.3s ease-out forwards;
+  .admin-textarea {
+    @apply w-full px-4 py-3 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-y min-h-[200px];
   }
 
-  /* Stagger delays for grid layouts */
-  @media (min-width: 32em) {
-    .blog-feed__item:nth-child(2).animate-fadeInUp {
-      animation-delay: 150ms;
-    }
+  .admin-select {
+    @apply w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
   }
 
-  @media (min-width: 60em) {
-    .blog-feed__item:nth-child(2).animate-fadeInUp {
-      animation-delay: 150ms;
-    }
-    .blog-feed__item:nth-child(3).animate-fadeInUp {
-      animation-delay: 300ms;
-    }
+  .admin-card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-sm;
   }
 
-  /* Fluid typography for article titles */
-  .fluid-title {
-    font-size: clamp(2.5rem, 8vw + 0.625rem, 12.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.03em;
+  .admin-table {
+    @apply w-full border-collapse;
   }
 
-  @media (min-width: 768px) {
-    .fluid-title {
-      font-size: clamp(5rem, 10vw + 1.25rem, 15rem);
-    }
+  .admin-table th {
+    @apply text-left p-3 bg-muted font-semibold text-sm uppercase tracking-wide border-b border-border;
   }
 
-  @media (min-width: 1024px) {
-    .fluid-title {
-      font-size: clamp(6.25rem, 12vw + 1.875rem, 18.75rem);
-    }
+  .admin-table td {
+    @apply p-3 border-b border-border;
   }
 
-  /* Grid System - Article Layout (Tailwind @layer components) */
-  @layer components {
-    /* Main Article Grid Container */
-    .article-grid {
-      @apply grid w-full max-w-[1920px] mx-auto gap-0;
-      @apply grid-cols-18 mb-[2.734375rem];
-      @apply md:grid-cols-22;
-      @apply lgPlus:grid-cols-30 lgPlus:mb-[3.75rem];
-    }
-
-    /* Article Header Grid - Grid for navigation without vertical margins */
-    .article-header-grid {
-      @apply grid w-full max-w-[1920px] mx-auto gap-0;
-      @apply grid-cols-18;
-      @apply md:grid-cols-22;
-      @apply lgPlus:grid-cols-30;
-    }
+  .admin-table tr:hover td {
+    @apply bg-muted/50;
   }
-
-    /* Article Body - Narrow reading width with responsive typography */
-    .article-body {
-      @apply col-start-2 col-span-16;
-      @apply md:col-start-3 md:col-span-18;
-      @apply lgPlus:col-start-8 lgPlus:col-span-16;
-      @apply text-[1.125rem] leading-[1.45] tracking-[-0.01em];
-      @apply md:text-[1.5rem];
-      @apply lgPlus:text-[1.625rem];
-      @apply 3xl:text-[2.25rem];
-    }
-
-    /* Article Standard Content - Standard width, no typography */
-    .article-content-standard {
-      @apply col-start-2 col-span-16;
-      @apply md:col-start-3 md:col-span-18;
-      @apply lgPlus:col-start-3 lgPlus:col-span-19;
-    }
-
-    /* Article Hero - Narrow width for hero content */
-    .article-hero {
-      @apply col-start-2 col-span-16;
-      @apply md:col-start-3 md:col-span-18;
-      @apply lgPlus:col-start-8 lgPlus:col-span-16;
-    }
-
-    /* Article Wide Content - For wider layouts */
-    .article-wide-content {
-      @apply self-center;
-      @apply col-start-2 col-span-16;
-      @apply md:col-start-3 md:col-span-18;
-      @apply lgPlus:col-start-3 lgPlus:col-span-19;
-    }
-
-    /* Article Centered Content - Extra narrow, centered */
-    .article-centered-content {
-      @apply self-center;
-      @apply col-start-2 col-span-16;
-      @apply md:col-start-3 md:col-span-18;
-      @apply lgPlus:col-start-9 lgPlus:col-span-14;
-    }
-
-    /* Article Full Width - Spans entire grid */
-    .article-full-width {
-      @apply col-span-full self-center;
-    }
-
-    /* Article Two Column Grid - For related articles, blog listings */
-    .article-two-columns {
-      @apply list-none m-0 p-0 grid gap-12;
-      @apply md:grid-cols-2 md:gap-[70px];
-      @apply lgPlus:gap-24;
-      @apply 3xl:gap-32;
-    }
-
-    /* Article Column Left - Left side of two-column layout */
-    .article-column-left {
-      @apply col-start-1 col-end-9;
-      @apply md:col-start-1 md:col-end-11;
-      @apply lgPlus:col-start-1 lgPlus:col-end-15;
-    }
-
-    /* Article Column Right - Right side of two-column layout */
-    .article-column-right {
-      @apply col-start-10 col-end-[-1];
-      @apply md:col-start-12 md:col-end-[-1];
-      @apply lgPlus:col-start-16 lgPlus:col-end-[-1];
-    }
-    /* Article Section Grid - For section-based layouts */
-    .article-section-grid {
-      @apply grid w-full max-w-[1920px] gap-0;
-      @apply grid-cols-18 my-5;
-      @apply md:grid-cols-22 md:my-[2.734375rem];
-      @apply lgPlus:grid-cols-30 lgPlus:my-[3.75rem];
-      @apply 3xl:my-20;
-    }
-
-    /* Article Section Content - Inner grid for sections */
-    .article-section-content {
-      @apply grid w-full max-w-[1920px] gap-0;
-      @apply grid-cols-16 my-8 mb-12;
-      @apply md:grid-cols-18;
-      @apply lgPlus:grid-cols-26;
-    }
-
-    /* Article Wrapper Full - Full width wrapper */
-    .article-wrapper-full {
-      @apply col-span-full;
-    }
-
-    /* Article Wrapper Constrained - Constrained width wrapper */
-    .article-wrapper-constrained {
-      @apply col-start-2 col-span-16;
-      @apply md:col-start-3 md:col-span-18;
-      @apply lgPlus:col-start-3 lgPlus:col-span-26;
-    }
-  }
+}

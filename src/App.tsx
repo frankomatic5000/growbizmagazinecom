@@ -4,8 +4,20 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "@/components/ScrollToTop";
-import Index from "./pages/Index";
-import Article from "./pages/Article";
+import { AuthProvider } from "@/hooks/useAuth";
+
+// News portal pages
+import NewsHome from "./pages/NewsHome";
+import NewsArticle from "./pages/NewsArticle";
+import NewsCategory from "./pages/NewsCategory";
+import NewsSearch from "./pages/NewsSearch";
+
+// Admin pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminArticleEditor from "./pages/admin/AdminArticleEditor";
+
+// Other pages
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
@@ -15,20 +27,33 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/blog" element={<Index />} />
-          <Route path="/article/:slug" element={<Article />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            {/* Public news portal routes */}
+            <Route path="/" element={<NewsHome />} />
+            <Route path="/noticia/:id" element={<NewsArticle />} />
+            <Route path="/categoria/:category" element={<NewsCategory />} />
+            <Route path="/busca" element={<NewsSearch />} />
+            
+            {/* Static pages */}
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            
+            {/* Hidden Admin routes - secure path */}
+            <Route path="/secure-content-editor-2026/login" element={<AdminLogin />} />
+            <Route path="/secure-content-editor-2026" element={<AdminDashboard />} />
+            <Route path="/secure-content-editor-2026/novo" element={<AdminArticleEditor />} />
+            <Route path="/secure-content-editor-2026/editar/:id" element={<AdminArticleEditor />} />
+            
+            {/* Catch-all */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
