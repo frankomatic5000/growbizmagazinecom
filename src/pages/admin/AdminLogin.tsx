@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Shield, UserPlus } from 'lucide-react';
+import { Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
@@ -14,14 +14,19 @@ const loginSchema = z.object({
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
 });
 
+const emailSchema = z.object({
+  email: z.string().email('Email inválido'),
+});
+
 export default function AdminLogin() {
-  const { signIn, signUp, user, isAdmin, isLoading: authLoading } = useAuth();
+  const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   // Redirect if already authenticated and is admin
   useEffect(() => {
@@ -33,8 +38,41 @@ export default function AdminLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
-    // Validate input
+    if (isForgotPassword) {
+      // Validate email only
+      const validation = emailSchema.safeParse({ email });
+      if (!validation.success) {
+        setError(validation.error.errors[0].message);
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        const redirectUrl = `${window.location.origin}/secure-content-editor-2026/login`;
+        
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: redirectUrl,
+        });
+
+        if (resetError) {
+          setError(resetError.message);
+          return;
+        }
+
+        setSuccessMessage('Email de recuperação enviado! Verifique sua caixa de entrada.');
+        setEmail('');
+      } catch (err) {
+        setError('Ocorreu um erro. Tente novamente.');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // Validate input for login
     const validation = loginSchema.safeParse({ email, password });
     if (!validation.success) {
       setError(validation.error.errors[0].message);
@@ -44,59 +82,18 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        // Sign up new user
-        const { error: signUpError } = await signUp(email, password);
-        
-        if (signUpError) {
-          if (signUpError.message.includes('already registered')) {
-            setError('Este email já está cadastrado. Faça login.');
-          } else {
-            setError(signUpError.message);
-          }
-          return;
+      const { error: signInError } = await signIn(email, password);
+
+      if (signInError) {
+        if (signInError.message.includes('Invalid login credentials')) {
+          setError('Email ou senha incorretos');
+        } else {
+          setError(signInError.message);
         }
-
-        // Sign in immediately after signup
-        const { error: signInError } = await signIn(email, password);
-        if (signInError) {
-          setError('Conta criada. Faça login.');
-          setIsSignUp(false);
-          return;
-        }
-
-        // Try to bootstrap first admin (safe: returns false if an admin already exists)
-        const { data, error: bootstrapError } = await supabase.rpc(
-          'bootstrap_first_admin'
-        );
-
-        if (bootstrapError) {
-          console.error('Bootstrap error:', bootstrapError);
-          toast.error('Erro ao configurar administrador');
-        } else if (data) {
-          toast.success('Você foi configurado como o primeiro administrador!');
-          // Force reload to update admin status
-          window.location.href = '/secure-content-editor-2026';
-          return;
-        }
-
-        navigate('/secure-content-editor-2026');
-      } else {
-        // Regular sign in
-        const { error: signInError } = await signIn(email, password);
-
-        if (signInError) {
-          if (signInError.message.includes('Invalid login credentials')) {
-            setError('Email ou senha incorretos');
-          } else {
-            setError(signInError.message);
-          }
-          return;
-        }
-
-        // Redirect to admin dashboard
-        navigate('/secure-content-editor-2026');
+        return;
       }
+
+      navigate('/secure-content-editor-2026');
     } catch (err) {
       setError('Ocorreu um erro. Tente novamente.');
     } finally {
@@ -121,11 +118,11 @@ export default function AdminLogin() {
               <Shield className="h-8 w-8 text-primary" />
             </div>
             <h1 className="text-2xl font-bold text-center">
-              {isSignUp ? 'Criar Conta de Admin' : 'Acesso Restrito'}
+              {isForgotPassword ? 'Recuperar Senha' : 'Acesso Restrito'}
             </h1>
             <p className="text-muted-foreground text-center mt-2">
-              {isSignUp
-                ? 'Crie sua conta'
+              {isForgotPassword
+                ? 'Digite seu email para receber o link de recuperação'
                 : 'Entre com suas credenciais de administrador'}
             </p>
           </div>
@@ -144,27 +141,30 @@ export default function AdminLogin() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="admin-input"
-                required
-              />
-              {isSignUp && (
-                <p className="text-xs text-muted-foreground">
-                  Mínimo de 6 caracteres
-                </p>
-              )}
-            </div>
+            {!isForgotPassword && (
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="admin-input"
+                  required
+                />
+              </div>
+            )}
 
             {error && (
               <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
                 {error}
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="p-3 rounded-md bg-primary/10 text-primary text-sm">
+                {successMessage}
               </div>
             )}
 
@@ -176,13 +176,10 @@ export default function AdminLogin() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isSignUp ? 'Criando conta...' : 'Entrando...'}
+                  {isForgotPassword ? 'Enviando...' : 'Entrando...'}
                 </>
-              ) : isSignUp ? (
-                <>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Criar Conta
-                </>
+              ) : isForgotPassword ? (
+                'Enviar Link de Recuperação'
               ) : (
                 'Entrar'
               )}
@@ -192,14 +189,15 @@ export default function AdminLogin() {
               <button
                 type="button"
                 onClick={() => {
-                  setIsSignUp(!isSignUp);
+                  setIsForgotPassword(!isForgotPassword);
                   setError('');
+                  setSuccessMessage('');
                 }}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                {isSignUp
-                  ? 'Já tem uma conta? Faça login'
-                  : 'Não tem conta? Cadastre-se'}
+                {isForgotPassword
+                  ? 'Voltar para o login'
+                  : 'Esqueci minha senha'}
               </button>
             </div>
           </form>
