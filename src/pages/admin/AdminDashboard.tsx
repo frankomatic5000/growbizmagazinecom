@@ -56,6 +56,15 @@ export default function AdminDashboard() {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
+    // After auth+role are resolved, block non-admins
+    if (!authLoading && user && !isAdmin) {
+      toast.error('Acesso negado. Você não tem permissão de administrador.');
+      signOut();
+      navigate('/secure-content-editor-2026/login');
+    }
+  }, [authLoading, user, isAdmin, signOut, navigate]);
+
+  useEffect(() => {
     const loadArticles = async () => {
       if (!isAdmin) return;
 
@@ -121,8 +130,8 @@ export default function AdminDashboard() {
     navigate('/secure-content-editor-2026/login');
   };
 
-  // Show loading while auth is being checked or while we have a user but admin status is still being determined
-  if (authLoading || (user && !isAdmin)) {
+  // Loading while auth/role is being checked
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -130,9 +139,8 @@ export default function AdminDashboard() {
     );
   }
 
-  // If we have a user but they're definitely not admin (this check happens after loading is complete)
-  if (user && !isAdmin && !authLoading) {
-    // We need to verify admin status properly - give it a moment
+  // We'll be redirected by the effect above
+  if (!user || !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

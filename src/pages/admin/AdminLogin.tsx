@@ -22,26 +22,6 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const [hasAdmins, setHasAdmins] = useState<boolean | null>(null);
-
-  // Check if any admins exist
-  useEffect(() => {
-    const checkAdmins = async () => {
-      try {
-        const { count, error } = await supabase
-          .from('user_roles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'admin');
-
-        if (!error) {
-          setHasAdmins(count !== null && count > 0);
-        }
-      } catch (err) {
-        console.error('Error checking admins:', err);
-      }
-    };
-    checkAdmins();
-  }, []);
 
   // Redirect if already authenticated and is admin
   useEffect(() => {
@@ -85,19 +65,19 @@ export default function AdminLogin() {
           return;
         }
 
-        // Bootstrap as first admin if no admins exist
-        if (!hasAdmins) {
-          const { data, error: bootstrapError } = await supabase.rpc('bootstrap_first_admin');
-          
-          if (bootstrapError) {
-            console.error('Bootstrap error:', bootstrapError);
-            toast.error('Erro ao configurar administrador');
-          } else if (data) {
-            toast.success('Você foi configurado como o primeiro administrador!');
-            // Force reload to update admin status
-            window.location.href = '/secure-content-editor-2026';
-            return;
-          }
+        // Try to bootstrap first admin (safe: returns false if an admin already exists)
+        const { data, error: bootstrapError } = await supabase.rpc(
+          'bootstrap_first_admin'
+        );
+
+        if (bootstrapError) {
+          console.error('Bootstrap error:', bootstrapError);
+          toast.error('Erro ao configurar administrador');
+        } else if (data) {
+          toast.success('Você foi configurado como o primeiro administrador!');
+          // Force reload to update admin status
+          window.location.href = '/secure-content-editor-2026';
+          return;
         }
 
         navigate('/secure-content-editor-2026');
@@ -145,20 +125,9 @@ export default function AdminLogin() {
             </h1>
             <p className="text-muted-foreground text-center mt-2">
               {isSignUp
-                ? hasAdmins === false
-                  ? 'Crie a primeira conta de administrador'
-                  : 'Crie sua conta de administrador'
+                ? 'Crie sua conta'
                 : 'Entre com suas credenciais de administrador'}
             </p>
-            
-            {hasAdmins === false && !isSignUp && (
-              <div className="mt-4 p-3 rounded-md bg-primary/10 text-sm text-center">
-                <p className="font-medium text-primary">Primeira configuração</p>
-                <p className="text-muted-foreground">
-                  Nenhum administrador encontrado. Crie uma conta para se tornar o primeiro admin.
-                </p>
-              </div>
-            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
