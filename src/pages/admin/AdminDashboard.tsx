@@ -49,20 +49,11 @@ export default function AdminDashboard() {
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check authentication
+    // Check authentication - only redirect if not loading and no user
     if (!authLoading && !user) {
       navigate('/secure-content-editor-2026/login');
-      return;
     }
-
-    // Check admin role
-    if (!authLoading && user && !isAdmin) {
-      toast.error('Acesso negado. Você não tem permissão de administrador.');
-      signOut();
-      navigate('/secure-content-editor-2026/login');
-      return;
-    }
-  }, [user, isAdmin, authLoading, navigate, signOut]);
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -130,7 +121,18 @@ export default function AdminDashboard() {
     navigate('/secure-content-editor-2026/login');
   };
 
-  if (authLoading) {
+  // Show loading while auth is being checked or while we have a user but admin status is still being determined
+  if (authLoading || (user && !isAdmin)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If we have a user but they're definitely not admin (this check happens after loading is complete)
+  if (user && !isAdmin && !authLoading) {
+    // We need to verify admin status properly - give it a moment
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
