@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { AdminUserManager } from '@/components/admin/AdminUserManager';
 import { toast } from 'sonner';
 
 const categoryLabels: Record<string, string> = {
@@ -161,6 +162,7 @@ export default function AdminDashboard() {
             <span className="text-sm text-muted-foreground hidden md:block">
               {user?.email}
             </span>
+            <AdminUserManager />
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Sair
