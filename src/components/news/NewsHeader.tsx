@@ -53,7 +53,7 @@ export default function NewsHeader() {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <h1 className="text-2xl md:text-3xl font-bold text-primary">
-              Portal<span className="text-foreground">News</span>
+              REVISTA <span className="text-foreground">GROW BIZ</span>
             </h1>
           </Link>
 
