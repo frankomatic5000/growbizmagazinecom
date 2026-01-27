@@ -56,11 +56,7 @@ export default function NewsHeader() {
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <img 
-              src={logoGrowbiz} 
-              alt="GrowBiz - A Global Media of Virtues" 
-              className="h-16 md:h-20 w-auto"
-            />
+            <img src={logoGrowbiz} alt="GrowBiz - A Global Media of Virtues" className="h-24 md:h-30 w-auto" />
           </Link>
 
           {/* Search bar - Desktop */}
@@ -79,7 +75,12 @@ export default function NewsHeader() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
                 />
-                <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full text-white hover:text-white hover:bg-transparent">
+                <Button
+                  type="submit"
+                  size="icon"
+                  variant="ghost"
+                  className="absolute right-0 top-0 h-full text-white hover:text-white hover:bg-transparent"
+                >
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
@@ -93,10 +94,20 @@ export default function NewsHeader() {
                 <Home className="h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-white hover:text-white hover:bg-white/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="text-white hover:text-white hover:bg-white/10"
+            >
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white hover:text-white hover:bg-white/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white hover:text-white hover:bg-white/10"
+            >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -114,7 +125,12 @@ export default function NewsHeader() {
                 className="w-full pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
                 autoFocus
               />
-              <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-full text-white hover:text-white hover:bg-transparent">
+              <Button
+                type="submit"
+                size="icon"
+                variant="ghost"
+                className="absolute right-0 top-0 h-full text-white hover:text-white hover:bg-transparent"
+              >
                 <Search className="h-4 w-4" />
               </Button>
             </div>
