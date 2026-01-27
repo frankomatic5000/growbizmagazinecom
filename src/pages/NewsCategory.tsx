@@ -9,13 +9,16 @@ import { useArticles } from '@/hooks/useArticles';
 import type { Article, ArticleCategory } from '@/hooks/useArticles';
 
 const categoryLabels: Record<string, string> = {
-  news: 'Notícias',
-  politics: 'Política',
-  economy: 'Economia',
-  sports: 'Esportes',
-  entertainment: 'Entretenimento',
-  technology: 'Tecnologia',
-  opinion: 'Opinião',
+  culture_arts: 'Culture & Arts',
+  education: 'Education',
+  entrepreneurship_business: 'Entrepreneurship & Business',
+  society_humanity: 'Society & Humanity',
+  psychology_wellbeing: 'Psychology & Well-Being',
+  sustainability_future: 'Sustainability & Future',
+  lifestyle_purpose: 'Lifestyle with Purpose',
+  events: 'Events',
+  opinion_essays: 'Opinion & Essays',
+  biographies: 'Biographies',
 };
 
 export default function NewsCategory() {

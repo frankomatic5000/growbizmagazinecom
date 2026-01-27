@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const categories = [
-  { name: "Notícias", path: "/categoria/news" },
-  { name: "Política", path: "/categoria/politics" },
-  { name: "Economia", path: "/categoria/economy" },
-  { name: "Esportes", path: "/categoria/sports" },
-  { name: "Entretenimento", path: "/categoria/entertainment" },
-  { name: "Tecnologia", path: "/categoria/technology" },
-  { name: "Opinião", path: "/categoria/opinion" },
+  { name: "Culture & Arts", path: "/categoria/culture_arts" },
+  { name: "Education", path: "/categoria/education" },
+  { name: "Entrepreneurship & Business", path: "/categoria/entrepreneurship_business" },
+  { name: "Society & Humanity", path: "/categoria/society_humanity" },
+  { name: "Psychology & Well-Being", path: "/categoria/psychology_wellbeing" },
+  { name: "Sustainability & Future", path: "/categoria/sustainability_future" },
+  { name: "Lifestyle with Purpose", path: "/categoria/lifestyle_purpose" },
+  { name: "Events", path: "/categoria/events" },
+  { name: "Opinion & Essays", path: "/categoria/opinion_essays" },
+  { name: "Biographies", path: "/categoria/biographies" },
 ];
 
 export default function NewsHeader() {

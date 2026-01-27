@@ -23,7 +23,7 @@ const articleSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório').max(200, 'Título muito longo'),
   subtitle: z.string().max(300, 'Subtítulo muito longo').optional(),
   author: z.string().min(1, 'Autor é obrigatório').max(100, 'Nome muito longo'),
-  category: z.enum(['news', 'politics', 'economy', 'sports', 'entertainment', 'technology', 'opinion']),
+  category: z.enum(['culture_arts', 'education', 'entrepreneurship_business', 'society_humanity', 'psychology_wellbeing', 'sustainability_future', 'lifestyle_purpose', 'events', 'opinion_essays', 'biographies']),
   main_image: z.string().url('URL de imagem inválida').optional().or(z.literal('')),
   body: z.string().min(1, 'Conteúdo é obrigatório'),
   is_published: z.boolean(),
@@ -32,13 +32,16 @@ const articleSchema = z.object({
 type ArticleFormData = z.infer<typeof articleSchema>;
 
 const categories = [
-  { value: 'news', label: 'Notícias' },
-  { value: 'politics', label: 'Política' },
-  { value: 'economy', label: 'Economia' },
-  { value: 'sports', label: 'Esportes' },
-  { value: 'entertainment', label: 'Entretenimento' },
-  { value: 'technology', label: 'Tecnologia' },
-  { value: 'opinion', label: 'Opinião' },
+  { value: 'culture_arts', label: 'Culture & Arts' },
+  { value: 'education', label: 'Education' },
+  { value: 'entrepreneurship_business', label: 'Entrepreneurship & Business' },
+  { value: 'society_humanity', label: 'Society & Humanity' },
+  { value: 'psychology_wellbeing', label: 'Psychology & Well-Being' },
+  { value: 'sustainability_future', label: 'Sustainability & Future' },
+  { value: 'lifestyle_purpose', label: 'Lifestyle with Purpose' },
+  { value: 'events', label: 'Events' },
+  { value: 'opinion_essays', label: 'Opinion & Essays' },
+  { value: 'biographies', label: 'Biographies' },
 ];
 
 export default function AdminArticleEditor() {
@@ -52,7 +55,7 @@ export default function AdminArticleEditor() {
     title: '',
     subtitle: '',
     author: '',
-    category: 'news',
+    category: 'culture_arts',
     main_image: '',
     body: '',
     is_published: false,

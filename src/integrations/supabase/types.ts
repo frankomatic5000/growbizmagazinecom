@@ -103,13 +103,16 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       article_category:
-        | "news"
-        | "politics"
-        | "economy"
-        | "sports"
-        | "entertainment"
-        | "technology"
-        | "opinion"
+        | "culture_arts"
+        | "education"
+        | "entrepreneurship_business"
+        | "society_humanity"
+        | "psychology_wellbeing"
+        | "sustainability_future"
+        | "lifestyle_purpose"
+        | "events"
+        | "opinion_essays"
+        | "biographies"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -239,13 +242,16 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       article_category: [
-        "news",
-        "politics",
-        "economy",
-        "sports",
-        "entertainment",
-        "technology",
-        "opinion",
+        "culture_arts",
+        "education",
+        "entrepreneurship_business",
+        "society_humanity",
+        "psychology_wellbeing",
+        "sustainability_future",
+        "lifestyle_purpose",
+        "events",
+        "opinion_essays",
+        "biographies",
       ],
     },
   },
