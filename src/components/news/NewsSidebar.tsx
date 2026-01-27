@@ -24,7 +24,7 @@ export default function NewsSidebar() {
       <div className="news-sidebar">
         <h2 className="flex items-center gap-2 text-lg font-bold mb-4">
           <TrendingUp className="h-5 w-5 text-primary" />
-          Mais Lidas
+          Most Read
         </h2>
         {isLoading ? (
           <div className="space-y-4">
@@ -40,7 +40,7 @@ export default function NewsSidebar() {
             {mostRead.map((article, index) => (
               <li key={article.id} className="group">
                 <Link
-                  to={`/noticia/${article.id}`}
+                  to={`/article/${article.id}`}
                   className="flex gap-3 items-start"
                 >
                   <span className="text-2xl font-bold text-primary/40 group-hover:text-primary transition-colors">
@@ -51,7 +51,7 @@ export default function NewsSidebar() {
                       {article.title}
                     </h3>
                     <span className="text-xs text-muted-foreground">
-                      {article.view_count} visualizações
+                      {article.view_count} views
                     </span>
                   </div>
                 </Link>
@@ -60,34 +60,34 @@ export default function NewsSidebar() {
           </ol>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Nenhuma notícia publicada ainda.
+            No articles published yet.
           </p>
         )}
       </div>
 
-      {/* Quotes Placeholder */}
+      {/* Markets Placeholder */}
       <div className="news-sidebar">
-        <h2 className="text-lg font-bold mb-4">Cotações</h2>
+        <h2 className="text-lg font-bold mb-4">Markets</h2>
         <div className="space-y-3">
           <div className="flex justify-between items-center py-2 border-b border-border">
-            <span className="font-medium">Dólar</span>
-            <span className="text-green-600">R$ 5,23 ↑</span>
+            <span className="font-medium">USD/EUR</span>
+            <span className="text-green-600">0.92 ↑</span>
           </div>
           <div className="flex justify-between items-center py-2 border-b border-border">
-            <span className="font-medium">Euro</span>
-            <span className="text-red-600">R$ 5,68 ↓</span>
+            <span className="font-medium">S&P 500</span>
+            <span className="text-red-600">5,234 ↓</span>
           </div>
           <div className="flex justify-between items-center py-2 border-b border-border">
-            <span className="font-medium">Ibovespa</span>
-            <span className="text-green-600">128.450 ↑</span>
+            <span className="font-medium">Nasdaq</span>
+            <span className="text-green-600">16,450 ↑</span>
           </div>
           <div className="flex justify-between items-center py-2">
             <span className="font-medium">Bitcoin</span>
-            <span className="text-green-600">$67.890 ↑</span>
+            <span className="text-green-600">$67,890 ↑</span>
           </div>
         </div>
         <p className="text-xs text-muted-foreground mt-3">
-          * Dados ilustrativos
+          * Illustrative data
         </p>
       </div>
     </aside>

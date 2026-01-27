@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Mail, MailOpen, Trash2, Phone, User } from "lucide-react";
+import { enUS } from "date-fns/locale";
+import { Mail, MailOpen, Trash2, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -79,14 +79,14 @@ const AdminContactMessages = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contact-messages"] });
       toast({
-        title: "Mensagem excluída",
-        description: "A mensagem foi removida com sucesso.",
+        title: "Message deleted",
+        description: "The message has been successfully removed.",
       });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível excluir a mensagem.",
+        title: "Error",
+        description: "Could not delete the message.",
         variant: "destructive",
       });
     },
@@ -117,9 +117,9 @@ const AdminContactMessages = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-display font-bold">Mensagens de Contato</h2>
+          <h2 className="text-2xl font-display font-bold">Contact Messages</h2>
           <p className="text-muted-foreground">
-            {messages?.length || 0} mensagens • {unreadCount} não lidas
+            {messages?.length || 0} messages • {unreadCount} unread
           </p>
         </div>
       </div>
@@ -128,7 +128,7 @@ const AdminContactMessages = () => {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Mail className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Nenhuma mensagem recebida ainda.</p>
+            <p className="text-muted-foreground">No messages received yet.</p>
           </CardContent>
         </Card>
       ) : (
@@ -160,7 +160,7 @@ const AdminContactMessages = () => {
                         </CardTitle>
                         {!message.is_read && (
                           <Badge variant="default" className="text-xs">
-                            Nova
+                            New
                           </Badge>
                         )}
                       </div>
@@ -180,8 +180,8 @@ const AdminContactMessages = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                      {format(new Date(message.created_at), "dd MMM yyyy, HH:mm", {
-                        locale: ptBR,
+                      {format(new Date(message.created_at), "MMM d, yyyy, h:mm a", {
+                        locale: enUS,
                       })}
                     </span>
                     <AlertDialog>
@@ -197,19 +197,19 @@ const AdminContactMessages = () => {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Excluir mensagem?</AlertDialogTitle>
+                          <AlertDialogTitle>Delete message?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Esta ação não pode ser desfeita. A mensagem será
-                            permanentemente removida.
+                            This action cannot be undone. The message will be
+                            permanently removed.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => deleteMutation.mutate(message.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            Excluir
+                            Delete
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -239,12 +239,12 @@ const AdminContactMessages = () => {
                       {message.is_read ? (
                         <>
                           <Mail className="h-4 w-4 mr-2" />
-                          Marcar como não lida
+                          Mark as unread
                         </>
                       ) : (
                         <>
                           <MailOpen className="h-4 w-4 mr-2" />
-                          Marcar como lida
+                          Mark as read
                         </>
                       )}
                     </Button>
@@ -255,7 +255,7 @@ const AdminContactMessages = () => {
                     >
                       <a href={`mailto:${message.email}`}>
                         <Mail className="h-4 w-4 mr-2" />
-                        Responder por e-mail
+                        Reply by email
                       </a>
                     </Button>
                   </div>

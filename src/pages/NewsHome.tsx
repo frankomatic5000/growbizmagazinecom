@@ -73,7 +73,7 @@ export default function NewsHome() {
             {featuredArticles.length > 0 && (
               <section className="mb-10">
                 <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
-                  🌟 Destaques
+                  🌟 Featured
                 </h2>
                 {featuredArticles.length === 1 ? (
                   <NewsCard article={featuredArticles[0]} variant="featured" />
@@ -91,7 +91,7 @@ export default function NewsHome() {
             {todayArticles.length > 0 && (
               <section className="mb-10">
                 <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
-                  📰 Notícias do Dia
+                  📰 Today's Articles
                 </h2>
                 <div className="news-grid-2col">
                   {todayArticles.map((article) => (
@@ -109,7 +109,7 @@ export default function NewsHome() {
                 {otherArticles.length > 0 && (
                   <section>
                     <h2 className="text-xl font-bold mb-4 pb-2 border-b border-border">
-                      Mais Notícias
+                      More Articles
                     </h2>
                     <div className="space-y-4">
                       {otherArticles.map((article) => (

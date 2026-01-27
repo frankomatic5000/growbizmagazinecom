@@ -3,21 +3,17 @@ import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 
 const footerLinks = {
   institutional: [
-    { name: "Sobre Nós", path: "/sobre" },
-    { name: "Equipe", path: "/equipe" },
-    { name: "Contato", path: "/contact" },
-    { name: "Trabalhe Conosco", path: "/carreiras" },
+    { name: "About Us", path: "/about" },
+    { name: "Contact", path: "/contact" },
   ],
   categories: [
-    { name: "Culture & Arts", path: "/categoria/culture_arts" },
-    { name: "Education", path: "/categoria/education" },
-    { name: "Entrepreneurship & Business", path: "/categoria/entrepreneurship_business" },
-    { name: "Society & Humanity", path: "/categoria/society_humanity" },
+    { name: "Culture & Arts", path: "/category/culture_arts" },
+    { name: "Education", path: "/category/education" },
+    { name: "Entrepreneurship & Business", path: "/category/entrepreneurship_business" },
+    { name: "Society & Humanity", path: "/category/society_humanity" },
   ],
   legal: [
-    { name: "Política de Privacidade", path: "/privacy-policy" },
-    { name: "Termos de Uso", path: "/termos" },
-    { name: "Cookies", path: "/cookies" },
+    { name: "Privacy Policy", path: "/privacy-policy" },
   ],
 };
 
@@ -36,7 +32,6 @@ export default function NewsFooter() {
           {/* Brand */}
           <div>
             <Link to="/" className="inline-block mb-4">
-              {/* Classes adicionadas para centralizar o conteúdo */}
               <div className="flex flex-col items-center">
                 <h2 className="text-2xl font-serif font-semibold tracking-tight">GrowBiz</h2>
                 <span className="text-[9px] font-sans font-medium tracking-[0.15em] text-muted-foreground uppercase">
@@ -45,8 +40,7 @@ export default function NewsFooter() {
               </div>
             </Link>
             <p className="text-muted-foreground text-sm mb-4">
-              Sua fonte confiável de notícias e informações. Cobrindo os principais acontecimentos do Brasil e do mundo
-              com credibilidade e imparcialidade.
+              Your trusted source for stories that reveal meaning, beauty, and depth. Covering inspiring journeys from around the world with credibility and sensitivity.
             </p>
             {/* Social Links */}
             <div className="flex gap-3">
@@ -67,7 +61,7 @@ export default function NewsFooter() {
 
           {/* Institutional */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Institucional</h3>
+            <h3 className="font-semibold text-lg mb-4">Institutional</h3>
             <ul className="space-y-2">
               {footerLinks.institutional.map((link) => (
                 <li key={link.path}>
@@ -81,7 +75,7 @@ export default function NewsFooter() {
 
           {/* Categories */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Categorias</h3>
+            <h3 className="font-semibold text-lg mb-4">Categories</h3>
             <ul className="space-y-2">
               {footerLinks.categories.map((link) => (
                 <li key={link.path}>
@@ -110,7 +104,7 @@ export default function NewsFooter() {
 
         {/* Bottom bar */}
         <div className="border-t border-border/20 mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} GrowBiz. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} GrowBiz. All rights reserved.</p>
         </div>
       </div>
     </footer>

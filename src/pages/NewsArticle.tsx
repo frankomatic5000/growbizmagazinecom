@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Eye, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import NewsHeader from '@/components/news/NewsHeader';
 import NewsFooter from '@/components/news/NewsFooter';
 import NewsSidebar from '@/components/news/NewsSidebar';
@@ -11,13 +11,16 @@ import type { Article } from '@/hooks/useArticles';
 import { Button } from '@/components/ui/button';
 
 const categoryLabels: Record<string, string> = {
-  news: 'Notícias',
-  politics: 'Política',
-  economy: 'Economia',
-  sports: 'Esportes',
-  entertainment: 'Entretenimento',
-  technology: 'Tecnologia',
-  opinion: 'Opinião',
+  culture_arts: 'Culture & Arts',
+  education: 'Education',
+  entrepreneurship_business: 'Entrepreneurship & Business',
+  society_humanity: 'Society & Humanity',
+  psychology_wellbeing: 'Psychology & Well-Being',
+  sustainability_future: 'Sustainability & Future',
+  lifestyle_purpose: 'Lifestyle with Purpose',
+  events: 'Events',
+  opinion_essays: 'Opinion & Essays',
+  biographies: 'Biographies',
 };
 
 export default function NewsArticle() {
@@ -78,12 +81,12 @@ export default function NewsArticle() {
       <div className="min-h-screen bg-background">
         <NewsHeader />
         <main className="news-container py-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">Notícia não encontrada</h1>
+          <h1 className="text-2xl font-bold mb-4">Article not found</h1>
           <p className="text-muted-foreground mb-8">
-            A notícia que você está procurando não existe ou foi removida.
+            The article you're looking for doesn't exist or has been removed.
           </p>
           <Link to="/">
-            <Button>Voltar para a home</Button>
+            <Button>Back to home</Button>
           </Link>
         </main>
         <NewsFooter />
@@ -91,8 +94,8 @@ export default function NewsArticle() {
     );
   }
 
-  const formattedDate = format(new Date(article.created_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
-    locale: ptBR,
+  const formattedDate = format(new Date(article.created_at), "MMMM d, yyyy 'at' h:mm a", {
+    locale: enUS,
   });
 
   return (
@@ -109,7 +112,7 @@ export default function NewsArticle() {
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
               <ArrowLeft className="h-4 w-4" />
-              Voltar
+              Back
             </Link>
 
             {/* Category */}
@@ -138,7 +141,7 @@ export default function NewsArticle() {
               </span>
               <span className="flex items-center gap-1">
                 <Eye className="h-4 w-4" />
-                {article.view_count} visualizações
+                {article.view_count} views
               </span>
             </div>
 
@@ -146,14 +149,14 @@ export default function NewsArticle() {
             <div className="flex items-center gap-3 mb-8">
               <span className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Share2 className="h-4 w-4" />
-                Compartilhar:
+                Share:
               </span>
               <a
                 href={shareLinks.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-80 transition-opacity"
-                aria-label="Compartilhar no Facebook"
+                aria-label="Share on Facebook"
               >
                 <Facebook className="h-4 w-4" />
               </a>
@@ -162,7 +165,7 @@ export default function NewsArticle() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1DA1F2] text-white hover:opacity-80 transition-opacity"
-                aria-label="Compartilhar no Twitter"
+                aria-label="Share on Twitter"
               >
                 <Twitter className="h-4 w-4" />
               </a>
@@ -171,7 +174,7 @@ export default function NewsArticle() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-[#0A66C2] text-white hover:opacity-80 transition-opacity"
-                aria-label="Compartilhar no LinkedIn"
+                aria-label="Share on LinkedIn"
               >
                 <Linkedin className="h-4 w-4" />
               </a>
@@ -202,14 +205,14 @@ export default function NewsArticle() {
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Share2 className="h-4 w-4" />
-                  Compartilhar:
+                  Share:
                 </span>
                 <a
                   href={shareLinks.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-80 transition-opacity"
-                  aria-label="Compartilhar no Facebook"
+                  aria-label="Share on Facebook"
                 >
                   <Facebook className="h-4 w-4" />
                 </a>
@@ -218,7 +221,7 @@ export default function NewsArticle() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1DA1F2] text-white hover:opacity-80 transition-opacity"
-                  aria-label="Compartilhar no Twitter"
+                  aria-label="Share on Twitter"
                 >
                   <Twitter className="h-4 w-4" />
                 </a>
@@ -227,7 +230,7 @@ export default function NewsArticle() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-[#0A66C2] text-white hover:opacity-80 transition-opacity"
-                  aria-label="Compartilhar no LinkedIn"
+                  aria-label="Share on LinkedIn"
                 >
                   <Linkedin className="h-4 w-4" />
                 </a>

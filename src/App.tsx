@@ -20,6 +20,7 @@ import AdminArticleEditor from "./pages/admin/AdminArticleEditor";
 // Other pages
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AboutUs from "./pages/AboutUs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,13 +36,14 @@ const App = () => (
           <Routes>
             {/* Public news portal routes */}
             <Route path="/" element={<NewsHome />} />
-            <Route path="/noticia/:id" element={<NewsArticle />} />
-            <Route path="/categoria/:category" element={<NewsCategory />} />
-            <Route path="/busca" element={<NewsSearch />} />
+            <Route path="/article/:id" element={<NewsArticle />} />
+            <Route path="/category/:category" element={<NewsCategory />} />
+            <Route path="/search" element={<NewsSearch />} />
             
             {/* Static pages */}
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/about" element={<AboutUs />} />
             
             {/* Hidden Admin routes - secure path */}
             <Route path="/secure-content-editor-2026/login" element={<AdminLogin />} />

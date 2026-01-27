@@ -27,10 +27,10 @@ import {
 } from "@/components/ui/card";
 
 const contactSchema = z.object({
-  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
-  email: z.string().email("Email inválido").max(255),
+  name: z.string().min(2, "Name must be at least 2 characters").max(100),
+  email: z.string().email("Invalid email address").max(255),
   phone: z.string().max(20).optional(),
-  message: z.string().min(10, "Mensagem deve ter pelo menos 10 caracteres").max(2000),
+  message: z.string().min(10, "Message must be at least 10 characters").max(2000),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -61,15 +61,15 @@ const Contact = () => {
       if (error) throw error;
 
       toast({
-        title: "Mensagem enviada!",
-        description: "Obrigado pelo seu contato. Responderemos em breve.",
+        title: "Message sent!",
+        description: "Thank you for reaching out. We'll get back to you soon.",
       });
       form.reset();
     } catch (error) {
       console.error("Error submitting contact form:", error);
       toast({
-        title: "Erro ao enviar",
-        description: "Ocorreu um erro. Por favor, tente novamente.",
+        title: "Error sending message",
+        description: "An error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -87,10 +87,10 @@ const Contact = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
-                Entre em Contato
+                Get in Touch
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground">
-                Estamos aqui para ouvir você. Envie sua mensagem, sugestão ou dúvida.
+                We're here to listen. Send us your message, suggestion, or question.
               </p>
             </div>
           </div>
@@ -106,15 +106,15 @@ const Contact = () => {
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
                       <Phone className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle className="font-display text-xl">Telefone</CardTitle>
-                    <CardDescription>Ligue para nós</CardDescription>
+                    <CardTitle className="font-display text-xl">Phone</CardTitle>
+                    <CardDescription>Call us</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-foreground font-medium">
                       (XX) XXXX-XXXX
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Segunda a Sexta, 9h às 18h
+                      Monday to Friday, 9am to 6pm
                     </p>
                   </CardContent>
                 </Card>
@@ -125,14 +125,14 @@ const Contact = () => {
                       <MessageCircle className="h-6 w-6 text-green-600" />
                     </div>
                     <CardTitle className="font-display text-xl">WhatsApp</CardTitle>
-                    <CardDescription>Mensagem rápida</CardDescription>
+                    <CardDescription>Quick message</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-foreground font-medium">
                       (XX) XXXXX-XXXX
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Respondemos em até 24h
+                      We respond within 24 hours
                     </p>
                   </CardContent>
                 </Card>
@@ -142,15 +142,15 @@ const Contact = () => {
                     <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-2">
                       <Mail className="h-6 w-6 text-blue-600" />
                     </div>
-                    <CardTitle className="font-display text-xl">E-mail</CardTitle>
-                    <CardDescription>Envie um e-mail</CardDescription>
+                    <CardTitle className="font-display text-xl">Email</CardTitle>
+                    <CardDescription>Send us an email</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-foreground font-medium">
-                      contato@growbiz.com
+                      contact@growbiz.com
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Para parcerias e imprensa
+                      For partnerships and press
                     </p>
                   </CardContent>
                 </Card>
@@ -161,10 +161,10 @@ const Contact = () => {
                 <Card className="border-border/50">
                   <CardHeader>
                     <CardTitle className="font-display text-2xl">
-                      Envie sua mensagem
+                      Send Your Message
                     </CardTitle>
                     <CardDescription>
-                      Preencha o formulário abaixo e entraremos em contato o mais breve possível.
+                      Fill out the form below and we'll get back to you as soon as possible.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -176,10 +176,10 @@ const Contact = () => {
                             name="name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Nome completo *</FormLabel>
+                                <FormLabel>Full Name *</FormLabel>
                                 <FormControl>
                                   <Input 
-                                    placeholder="Seu nome" 
+                                    placeholder="Your name" 
                                     {...field} 
                                     className="bg-background"
                                   />
@@ -194,11 +194,11 @@ const Contact = () => {
                             name="email"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>E-mail *</FormLabel>
+                                <FormLabel>Email *</FormLabel>
                                 <FormControl>
                                   <Input 
                                     type="email" 
-                                    placeholder="seu@email.com" 
+                                    placeholder="you@email.com" 
                                     {...field}
                                     className="bg-background"
                                   />
@@ -214,7 +214,7 @@ const Contact = () => {
                           name="phone"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Telefone (opcional)</FormLabel>
+                              <FormLabel>Phone (optional)</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="tel" 
@@ -233,10 +233,10 @@ const Contact = () => {
                           name="message"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Mensagem *</FormLabel>
+                              <FormLabel>Message *</FormLabel>
                               <FormControl>
                                 <Textarea
-                                  placeholder="Escreva sua mensagem aqui..."
+                                  placeholder="Write your message here..."
                                   rows={6}
                                   {...field}
                                   className="bg-background resize-y"
@@ -254,11 +254,11 @@ const Contact = () => {
                           className="w-full md:w-auto"
                         >
                           {isSubmitting ? (
-                            "Enviando..."
+                            "Sending..."
                           ) : (
                             <>
                               <Send className="h-4 w-4 mr-2" />
-                              Enviar Mensagem
+                              Send Message
                             </>
                           )}
                         </Button>

@@ -41,10 +41,10 @@ export default function NewsSearch() {
         <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border">
           <Search className="h-6 w-6 text-muted-foreground" />
           <div>
-            <h1 className="text-3xl font-bold">Busca</h1>
+            <h1 className="text-3xl font-bold">Search</h1>
             {query && (
               <p className="text-muted-foreground">
-                Resultados para: <strong>"{query}"</strong>
+                Results for: <strong>"{query}"</strong>
               </p>
             )}
           </div>
@@ -52,8 +52,8 @@ export default function NewsSearch() {
 
         {!query.trim() ? (
           <EmptyState
-            title="Digite algo para buscar"
-            description="Use a barra de busca no topo da página para encontrar notícias."
+            title="Enter a search term"
+            description="Use the search bar at the top of the page to find articles."
           />
         ) : isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -67,14 +67,14 @@ export default function NewsSearch() {
           </div>
         ) : articles.length === 0 ? (
           <EmptyState
-            title="Nenhum resultado encontrado"
-            description={`Não encontramos notícias para "${query}". Tente usar outras palavras-chave.`}
+            title="No results found"
+            description={`We couldn't find any articles for "${query}". Try using different keywords.`}
           />
         ) : (
           <div className="news-grid-main">
             <div className="lg:col-span-2">
               <p className="text-muted-foreground mb-6">
-                {articles.length} {articles.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}
+                {articles.length} {articles.length === 1 ? 'result found' : 'results found'}
               </p>
               <div className="space-y-4">
                 {articles.map((article) => (
