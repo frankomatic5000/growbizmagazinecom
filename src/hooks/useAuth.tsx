@@ -42,41 +42,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let mounted = true;
+
+    const checkAndSetAdmin = (userId: string) => {
+      // Mark loading while we determine the role
+      setIsLoading(true);
+
+      // Defer DB call to avoid auth deadlocks
+      setTimeout(() => {
+        checkAdminRole(userId)
+          .then((admin) => {
+            if (!mounted) return;
+            setIsAdmin(admin);
+          })
+          .catch(() => {
+            if (!mounted) return;
+            setIsAdmin(false);
+          })
+          .finally(() => {
+            if (!mounted) return;
+            setIsLoading(false);
+          });
+      }, 0);
+    };
+
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
 
-        if (currentSession?.user) {
-          // Check admin role inline (not deferred) to ensure state is updated properly
-          const adminStatus = await checkAdminRole(currentSession.user.id);
-          setIsAdmin(adminStatus);
-        } else {
-          setIsAdmin(false);
-        }
-
-        if (event === 'SIGNED_OUT') {
-          setIsAdmin(false);
-        }
+      if (currentSession?.user) {
+        checkAndSetAdmin(currentSession.user.id);
+      } else {
+        setIsAdmin(false);
+        setIsLoading(false);
       }
-    );
+
+      if (event === 'SIGNED_OUT') {
+        setIsAdmin(false);
+      }
+    });
 
     // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      if (!mounted) return;
+
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
 
       if (existingSession?.user) {
-        const isAdminUser = await checkAdminRole(existingSession.user.id);
-        setIsAdmin(isAdminUser);
-        setIsLoading(false);
+        checkAndSetAdmin(existingSession.user.id);
       } else {
+        setIsAdmin(false);
         setIsLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
