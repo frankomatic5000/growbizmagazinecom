@@ -19,8 +19,8 @@ export default {
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'serif': ['Georgia', 'serif'],
-        'display': ['Inter', 'system-ui', 'sans-serif'],
+        'serif': ['"Playfair Display"', 'Georgia', 'serif'],
+        'display': ['"Playfair Display"', 'Georgia', 'serif'],
       },
       gridTemplateColumns: {
         '16': 'repeat(16, minmax(0, 1fr))',

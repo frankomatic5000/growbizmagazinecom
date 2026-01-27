@@ -36,9 +36,14 @@ export default function NewsFooter() {
           {/* Brand */}
           <div>
             <Link to="/" className="inline-block mb-4">
-              <h2 className="text-2xl font-bold">
-                <span className="text-primary">Portal</span>News
-              </h2>
+              <div className="flex flex-col">
+                <h2 className="text-2xl font-serif font-semibold tracking-tight">
+                  GrowBiz
+                </h2>
+                <span className="text-[9px] font-sans font-medium tracking-[0.15em] text-muted-foreground uppercase">
+                  A Global Media of Virtues
+                </span>
+              </div>
             </Link>
             <p className="text-muted-foreground text-sm mb-4">
               Sua fonte confiável de notícias e informações. Cobrindo os principais
@@ -115,7 +120,7 @@ export default function NewsFooter() {
 
         {/* Bottom bar */}
         <div className="border-t border-border/20 mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} PortalNews. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} GrowBiz. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>
