@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User, Session, AuthenticatorAssuranceLevels } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
@@ -7,13 +7,9 @@ interface AuthContextType {
   session: Session | null;
   isAdmin: boolean;
   isLoading: boolean;
-  mfaStatus: 'none' | 'enrolled' | 'verified';
-  currentLevel: AuthenticatorAssuranceLevels | null;
-  nextLevel: AuthenticatorAssuranceLevels | null;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  refreshMFAStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,9 +19,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [mfaStatus, setMfaStatus] = useState<'none' | 'enrolled' | 'verified'>('none');
-  const [currentLevel, setCurrentLevel] = useState<AuthenticatorAssuranceLevels | null>(null);
-  const [nextLevel, setNextLevel] = useState<AuthenticatorAssuranceLevels | null>(null);
 
   const checkAdminRole = async (userId: string) => {
     try {
@@ -46,43 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Error checking admin role:', err);
       return false;
     }
-  };
-
-  const checkMFAStatus = async () => {
-    try {
-      const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      
-      if (aalError) {
-        console.error('Error checking AAL:', aalError);
-        return;
-      }
-
-      setCurrentLevel(aalData.currentLevel);
-      setNextLevel(aalData.nextLevel);
-
-      const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
-      
-      if (factorsError) {
-        console.error('Error listing factors:', factorsError);
-        return;
-      }
-
-      const verifiedFactors = factorsData.totp.filter(f => f.status === 'verified');
-      
-      if (verifiedFactors.length === 0) {
-        setMfaStatus('none');
-      } else if (aalData.currentLevel === 'aal2') {
-        setMfaStatus('verified');
-      } else {
-        setMfaStatus('enrolled');
-      }
-    } catch (err) {
-      console.error('Error in checkMFAStatus:', err);
-    }
-  };
-
-  const refreshMFAStatus = async () => {
-    await checkMFAStatus();
   };
 
   useEffect(() => {
@@ -116,22 +72,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (currentSession?.user) {
         checkAndSetAdmin(currentSession.user.id);
-        setTimeout(() => {
-          checkMFAStatus();
-        }, 0);
       } else {
         setIsAdmin(false);
-        setMfaStatus('none');
-        setCurrentLevel(null);
-        setNextLevel(null);
         setIsLoading(false);
       }
 
       if (event === 'SIGNED_OUT') {
         setIsAdmin(false);
-        setMfaStatus('none');
-        setCurrentLevel(null);
-        setNextLevel(null);
       }
     });
 
@@ -143,12 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (existingSession?.user) {
         checkAndSetAdmin(existingSession.user.id);
-        setTimeout(() => {
-          checkMFAStatus();
-        }, 0);
       } else {
         setIsAdmin(false);
-        setMfaStatus('none');
         setIsLoading(false);
       }
     });
@@ -183,9 +126,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
-    setMfaStatus('none');
-    setCurrentLevel(null);
-    setNextLevel(null);
   };
 
   return (
@@ -195,13 +135,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         isAdmin,
         isLoading,
-        mfaStatus,
-        currentLevel,
-        nextLevel,
         signIn,
         signUp,
         signOut,
-        refreshMFAStatus,
       }}
     >
       {children}
