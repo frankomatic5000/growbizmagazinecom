@@ -21,6 +21,10 @@ import AdminArticleEditor from "./pages/admin/AdminArticleEditor";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AboutUs from "./pages/AboutUs";
+import Mission from "./pages/Mission";
+import Vision from "./pages/Vision";
+import EditorialPrinciples from "./pages/EditorialPrinciples";
+import Values from "./pages/Values";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +48,10 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/about" element={<AboutUs />} />
+            <Route path="/mission" element={<Mission />} />
+            <Route path="/vision" element={<Vision />} />
+            <Route path="/editorial-principles" element={<EditorialPrinciples />} />
+            <Route path="/values" element={<Values />} />
             
             {/* Hidden Admin routes - secure path */}
             <Route path="/secure-content-editor-2026/login" element={<AdminLogin />} />
