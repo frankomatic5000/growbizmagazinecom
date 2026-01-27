@@ -6,10 +6,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Shield, UserPlus } from 'lucide-react';
+import { Loader2, Shield, UserPlus, Mail } from 'lucide-react';
 import { toast } from 'sonner';
-import MFAEnroll from '@/components/admin/MFAEnroll';
-import MFAVerify from '@/components/admin/MFAVerify';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -20,42 +18,50 @@ const emailSchema = z.object({
   email: z.string().email('Email inválido'),
 });
 
-type AuthStep = 'login' | 'mfa-enroll' | 'mfa-verify';
+type AuthStep = 'login' | 'email-verify';
 
 export default function AdminLogin() {
-  const { 
-    signIn, 
-    signUp, 
-    user, 
-    isAdmin, 
-    isLoading: authLoading,
-    mfaStatus,
-    refreshMFAStatus
-  } = useAuth();
+  const { signIn, signUp, user, isAdmin, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [authStep, setAuthStep] = useState<AuthStep>('login');
+  const [pendingEmail, setPendingEmail] = useState('');
 
-  // Handle auth flow after login
+  // Check for email verification session
   useEffect(() => {
+    const verifiedSession = sessionStorage.getItem('admin_email_verified');
     if (!authLoading && user && isAdmin) {
-      if (mfaStatus === 'none') {
-        // Admin has no MFA configured - show enrollment
-        setAuthStep('mfa-enroll');
-      } else if (mfaStatus === 'enrolled') {
-        // MFA configured but not verified this session
-        setAuthStep('mfa-verify');
-      } else if (mfaStatus === 'verified') {
-        // MFA verified - allow access
+      if (verifiedSession === 'true') {
         navigate('/secure-content-editor-2026');
+      } else {
+        // Need email verification
+        setAuthStep('email-verify');
+        setPendingEmail(user.email || '');
+        sendVerificationEmail(user.email || '');
       }
     }
-  }, [user, isAdmin, authLoading, mfaStatus, navigate]);
+  }, [user, isAdmin, authLoading, navigate]);
+
+  const sendVerificationEmail = async (emailAddress: string) => {
+    try {
+      // Use Supabase's magic link as email verification
+      await supabase.auth.signInWithOtp({
+        email: emailAddress,
+        options: {
+          shouldCreateUser: false,
+        },
+      });
+      toast.success('Código de verificação enviado para seu email!');
+    } catch (err) {
+      console.error('Error sending verification:', err);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,7 +138,7 @@ export default function AdminLogin() {
         return;
       }
 
-      // After successful login, the useEffect will handle the MFA flow
+      // After successful login, the useEffect will handle the email verification flow
     } catch (err) {
       setError('Ocorreu um erro. Tente novamente.');
     } finally {
@@ -140,18 +146,45 @@ export default function AdminLogin() {
     }
   };
 
-  const handleMFAEnrollComplete = async () => {
-    await refreshMFAStatus();
-    navigate('/secure-content-editor-2026');
+  const handleVerifyEmail = async () => {
+    if (verificationCode.length !== 6) {
+      setError('O código deve ter 6 dígitos');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: pendingEmail,
+        token: verificationCode,
+        type: 'email',
+      });
+
+      if (verifyError) {
+        setError('Código inválido ou expirado. Tente novamente.');
+        return;
+      }
+
+      // Mark session as verified
+      sessionStorage.setItem('admin_email_verified', 'true');
+      toast.success('Verificação concluída!');
+      navigate('/secure-content-editor-2026');
+    } catch (err) {
+      setError('Erro ao verificar código. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleMFAVerifyComplete = async () => {
-    await refreshMFAStatus();
-    navigate('/secure-content-editor-2026');
-  };
-
-  const handleMFASkip = () => {
-    navigate('/secure-content-editor-2026');
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      await sendVerificationEmail(pendingEmail);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (authLoading) {
@@ -162,31 +195,72 @@ export default function AdminLogin() {
     );
   }
 
-  // Show MFA enrollment screen
-  if (authStep === 'mfa-enroll' && user && isAdmin) {
+  // Email verification step
+  if (authStep === 'email-verify' && user && isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted p-4">
         <div className="w-full max-w-md">
           <div className="admin-card">
-            <MFAEnroll 
-              onEnrollComplete={handleMFAEnrollComplete} 
-              onSkip={handleMFASkip}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Mail className="h-8 w-8 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold text-center">Verificação por Email</h1>
+              <p className="text-muted-foreground text-center mt-2">
+                Enviamos um código de 6 dígitos para
+              </p>
+              <p className="font-medium text-center">{pendingEmail}</p>
+            </div>
 
-  // Show MFA verification screen
-  if (authStep === 'mfa-verify' && user && isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-muted p-4">
-        <div className="w-full max-w-md">
-          <div className="admin-card">
-            <MFAVerify 
-              onVerifyComplete={handleMFAVerifyComplete}
-            />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="verificationCode">Código de Verificação</Label>
+                <Input
+                  id="verificationCode"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                  className="text-center text-3xl tracking-[0.5em] font-mono h-14"
+                  autoFocus
+                />
+              </div>
+
+              {error && (
+                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <Button
+                onClick={handleVerifyEmail}
+                disabled={isLoading || verificationCode.length !== 6}
+                className="w-full"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verificando...
+                  </>
+                ) : (
+                  'Verificar'
+                )}
+              </Button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={handleResendCode}
+                  disabled={isLoading}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Reenviar código
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
