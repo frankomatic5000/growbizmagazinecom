@@ -27,6 +27,7 @@ const articleSchema = z.object({
   main_image: z.string().url('URL de imagem inválida').optional().or(z.literal('')),
   body: z.string().min(1, 'Conteúdo é obrigatório'),
   is_published: z.boolean(),
+  is_featured: z.boolean(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -59,6 +60,7 @@ export default function AdminArticleEditor() {
     main_image: '',
     body: '',
     is_published: false,
+    is_featured: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -86,6 +88,7 @@ export default function AdminArticleEditor() {
             main_image: article.main_image || '',
             body: article.body,
             is_published: article.is_published,
+            is_featured: (article as any).is_featured || false,
           });
         } else {
           toast.error('Artigo não encontrado');
@@ -133,7 +136,8 @@ export default function AdminArticleEditor() {
           main_image: formData.main_image || null,
           body: formData.body,
           is_published: formData.is_published,
-        });
+          is_featured: formData.is_featured,
+        } as any);
         toast.success('Artigo atualizado com sucesso');
       } else {
         await createArticle({
@@ -144,8 +148,9 @@ export default function AdminArticleEditor() {
           main_image: formData.main_image || null,
           body: formData.body,
           is_published: formData.is_published,
+          is_featured: formData.is_featured,
           created_by: user?.id,
-        });
+        } as any);
         toast.success('Artigo criado com sucesso');
       }
 
@@ -350,7 +355,7 @@ export default function AdminArticleEditor() {
           </div>
 
           {/* Publish toggle */}
-          <div className="admin-card">
+          <div className="admin-card space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="is_published" className="text-base font-medium">
@@ -365,6 +370,24 @@ export default function AdminArticleEditor() {
                 checked={formData.is_published}
                 onCheckedChange={(checked) =>
                   setFormData((prev) => ({ ...prev, is_published: checked }))
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-border">
+              <div>
+                <Label htmlFor="is_featured" className="text-base font-medium">
+                  Destaque
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Artigos em destaque aparecem na seção especial da página inicial.
+                </p>
+              </div>
+              <Switch
+                id="is_featured"
+                checked={formData.is_featured}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, is_featured: checked }))
                 }
               />
             </div>

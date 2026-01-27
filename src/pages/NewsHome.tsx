@@ -9,8 +9,8 @@ import type { Article } from '@/hooks/useArticles';
 
 export default function NewsHome() {
   const { articles, isLoading, fetchArticles } = useArticles();
-  const [featuredArticle, setFeaturedArticle] = useState<Article | null>(null);
-  const [secondaryArticles, setSecondaryArticles] = useState<Article[]>([]);
+  const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
+  const [todayArticles, setTodayArticles] = useState<Article[]>([]);
   const [otherArticles, setOtherArticles] = useState<Article[]>([]);
 
   useEffect(() => {
@@ -19,15 +19,34 @@ export default function NewsHome() {
 
   useEffect(() => {
     if (articles.length > 0) {
-      // First article is featured
-      setFeaturedArticle(articles[0]);
-      // Next 4 are secondary
-      setSecondaryArticles(articles.slice(1, 5));
-      // Rest are other articles
-      setOtherArticles(articles.slice(5));
+      // Get today's date at midnight for comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Separate featured articles
+      const featured = articles.filter((a: any) => a.is_featured);
+      const nonFeatured = articles.filter((a: any) => !a.is_featured);
+
+      // Get today's articles (published today)
+      const todayNews = nonFeatured.filter((a) => {
+        const articleDate = new Date(a.published_at || a.created_at);
+        articleDate.setHours(0, 0, 0, 0);
+        return articleDate.getTime() === today.getTime();
+      });
+
+      // Other articles (not featured and not from today)
+      const others = nonFeatured.filter((a) => {
+        const articleDate = new Date(a.published_at || a.created_at);
+        articleDate.setHours(0, 0, 0, 0);
+        return articleDate.getTime() !== today.getTime();
+      });
+
+      setFeaturedArticles(featured);
+      setTodayArticles(todayNews);
+      setOtherArticles(others);
     } else {
-      setFeaturedArticle(null);
-      setSecondaryArticles([]);
+      setFeaturedArticles([]);
+      setTodayArticles([]);
       setOtherArticles([]);
     }
   }, [articles]);
@@ -50,28 +69,42 @@ export default function NewsHome() {
           <EmptyState />
         ) : (
           <>
-            {/* Featured Article */}
-            {featuredArticle && (
-              <section className="mb-8">
-                <NewsCard article={featuredArticle} variant="featured" />
+            {/* Featured Articles Section */}
+            {featuredArticles.length > 0 && (
+              <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
+                  🌟 Destaques
+                </h2>
+                {featuredArticles.length === 1 ? (
+                  <NewsCard article={featuredArticles[0]} variant="featured" />
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {featuredArticles.slice(0, 4).map((article) => (
+                      <NewsCard key={article.id} article={article} />
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Today's News Section */}
+            {todayArticles.length > 0 && (
+              <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
+                  📰 Notícias do Dia
+                </h2>
+                <div className="news-grid-2col">
+                  {todayArticles.map((article) => (
+                    <NewsCard key={article.id} article={article} />
+                  ))}
+                </div>
               </section>
             )}
 
             {/* Main content grid */}
             <div className="news-grid-main">
-              {/* Left column - Articles */}
+              {/* Left column - Other Articles */}
               <div className="lg:col-span-2 space-y-8">
-                {/* Secondary articles grid */}
-                {secondaryArticles.length > 0 && (
-                  <section>
-                    <div className="news-grid-2col">
-                      {secondaryArticles.map((article) => (
-                        <NewsCard key={article.id} article={article} />
-                      ))}
-                    </div>
-                  </section>
-                )}
-
                 {/* Other articles */}
                 {otherArticles.length > 0 && (
                   <section>
