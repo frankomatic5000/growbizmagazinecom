@@ -52,9 +52,14 @@ export default function NewsHeader() {
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <h1 className="text-2xl md:text-3xl font-bold text-primary">
-              REVISTA <span className="text-foreground">GROW BIZ</span>
-            </h1>
+            <div className="flex flex-col">
+              <h1 className="text-3xl md:text-4xl font-serif font-semibold text-foreground tracking-tight">
+                GrowBiz
+              </h1>
+              <span className="text-[10px] md:text-xs font-sans font-medium tracking-[0.2em] text-muted-foreground uppercase">
+                A Global Media of Virtues
+              </span>
+            </div>
           </Link>
 
           {/* Search bar - Desktop */}
