@@ -125,6 +125,39 @@ export type Database = {
         }
         Relationships: []
       }
+      currency_rates: {
+        Row: {
+          change: number
+          code: string
+          created_at: string
+          id: string
+          last_update: string
+          name: string
+          previous_value: number | null
+          value: number
+        }
+        Insert: {
+          change?: number
+          code: string
+          created_at?: string
+          id?: string
+          last_update?: string
+          name: string
+          previous_value?: number | null
+          value: number
+        }
+        Update: {
+          change?: number
+          code?: string
+          created_at?: string
+          id?: string
+          last_update?: string
+          name?: string
+          previous_value?: number | null
+          value?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

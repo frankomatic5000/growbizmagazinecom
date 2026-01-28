@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
+import { TrendingUp, ArrowUp, ArrowDown } from 'lucide-react';
 import { useArticles } from '@/hooks/useArticles';
 import type { Article } from '@/hooks/useArticles';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,9 +53,6 @@ export default function NewsSidebar() {
 
   useEffect(() => {
     fetchRates();
-    // Refresh every 5 minutes
-    const interval = setInterval(fetchRates, 5 * 60 * 1000);
-    return () => clearInterval(interval);
   }, []);
 
   const formatValue = (code: string, value: number) => {
@@ -69,11 +66,17 @@ export default function NewsSidebar() {
     return `$${value.toFixed(2)}`;
   };
 
+  const formatChange = (change: number) => {
+    const sign = change >= 0 ? '+' : '';
+    return `${sign}${change.toFixed(2)}%`;
+  };
+
   const formatLastUpdate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -128,17 +131,7 @@ export default function NewsSidebar() {
 
       {/* Markets */}
       <div className="news-sidebar">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold">Mercados</h2>
-          <button
-            onClick={fetchRates}
-            disabled={ratesLoading}
-            className="p-1 hover:bg-muted rounded transition-colors disabled:opacity-50"
-            title="Atualizar cotações"
-          >
-            <RefreshCw className={`h-4 w-4 text-muted-foreground ${ratesLoading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
+        <h2 className="text-lg font-bold mb-4">Mercados</h2>
         
         {ratesLoading && rates.length === 0 ? (
           <div className="space-y-3">
@@ -159,24 +152,21 @@ export default function NewsSidebar() {
                 }`}
               >
                 <span className="font-medium text-sm">{rate.name}</span>
-                <div className="flex items-center gap-1">
-                  <span
-                    className={`text-sm font-semibold ${
-                      rate.change > 0
-                        ? 'text-green-600'
-                        : rate.change < 0
-                        ? 'text-red-600'
-                        : 'text-muted-foreground'
-                    }`}
-                  >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">
                     {formatValue(rate.code, rate.value)}
                   </span>
                   {rate.change !== 0 && (
-                    rate.change > 0 ? (
-                      <ArrowUp className="h-3 w-3 text-green-600" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3 text-red-600" />
-                    )
+                    <div className={`flex items-center gap-0.5 text-xs ${
+                      rate.change > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {rate.change > 0 ? (
+                        <ArrowUp className="h-3 w-3" />
+                      ) : (
+                        <ArrowDown className="h-3 w-3" />
+                      )}
+                      <span>{formatChange(rate.change)}</span>
+                    </div>
                   )}
                 </div>
               </div>
