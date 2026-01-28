@@ -69,59 +69,55 @@ export default function NewsHome() {
         ) : articles.length === 0 ? (
           <EmptyState />
         ) : (
-          <>
-            {/* Featured Articles Carousel */}
-            {featuredArticles.length > 0 && (
-              <section className="mb-10">
-                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
-                  🌟 Featured
-                </h2>
-                <FeaturedCarousel articles={featuredArticles} />
-              </section>
-            )}
+          <div className="flex flex-col xl:flex-row gap-8">
+            {/* Main content column */}
+            <div className="flex-1 min-w-0 space-y-10">
+              {/* Featured Articles Carousel */}
+              {featuredArticles.length > 0 && (
+                <section>
+                  <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
+                    🌟 Featured
+                  </h2>
+                  <FeaturedCarousel articles={featuredArticles} />
+                </section>
+              )}
 
-            {/* Today's News Section */}
-            {todayArticles.length > 0 && (
-              <section className="mb-10">
-                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
-                  📰 Today's Articles
-                </h2>
-                <div className="news-grid-2col">
-                  {todayArticles.map((article) => (
-                    <NewsCard key={article.id} article={article} />
-                  ))}
-                </div>
-              </section>
-            )}
+              {/* Today's News Section */}
+              {todayArticles.length > 0 && (
+                <section>
+                  <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
+                    📰 Today's Articles
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {todayArticles.map((article) => (
+                      <NewsCard key={article.id} article={article} />
+                    ))}
+                  </div>
+                </section>
+              )}
 
-            {/* Main content grid */}
-            <div className="news-grid-main">
-              {/* Left column - Other Articles */}
-              <div className="lg:col-span-2 xl:col-span-3 space-y-8">
-                {/* Other articles */}
-                {otherArticles.length > 0 && (
-                  <section>
-                    <h2 className="text-xl font-bold mb-4 pb-2 border-b border-border">
-                      More Articles
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {otherArticles.map((article) => (
-                        <NewsCard
-                          key={article.id}
-                          article={article}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )}
-              </div>
+              {/* Other articles */}
+              {otherArticles.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-bold mb-4 pb-2 border-b border-border">
+                    More Articles
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {otherArticles.map((article) => (
+                      <NewsCard key={article.id} article={article} />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
 
-              {/* Right column - Sidebar */}
-              <div className="lg:col-span-1">
+            {/* Sidebar - sticky on desktop */}
+            <aside className="w-full xl:w-80 xl:flex-shrink-0">
+              <div className="xl:sticky xl:top-8">
                 <NewsSidebar />
               </div>
-            </div>
-          </>
+            </aside>
+          </div>
         )}
       </main>
 
