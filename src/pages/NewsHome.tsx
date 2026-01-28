@@ -5,11 +5,13 @@ import NewsCard from '@/components/news/NewsCard';
 import NewsSidebar from '@/components/news/NewsSidebar';
 import EmptyState from '@/components/news/EmptyState';
 import FeaturedCarousel from '@/components/news/FeaturedCarousel';
+import HeadlineSection from '@/components/news/HeadlineSection';
 import { useArticles } from '@/hooks/useArticles';
 import type { Article } from '@/hooks/useArticles';
 
 export default function NewsHome() {
   const { articles, isLoading, fetchArticles } = useArticles();
+  const [headlineArticle, setHeadlineArticle] = useState<Article | null>(null);
   const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
   const [todayArticles, setTodayArticles] = useState<Article[]>([]);
   const [otherArticles, setOtherArticles] = useState<Article[]>([]);
@@ -24,28 +26,35 @@ export default function NewsHome() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      // Separate featured articles
-      const featured = articles.filter((a: any) => a.is_featured);
-      const nonFeatured = articles.filter((a: any) => !a.is_featured);
+      // Find the headline article (only one)
+      const headline = articles.find((a: any) => a.is_headline) || null;
+      
+      // Separate featured articles (excluding headline)
+      const featured = articles.filter((a: any) => a.is_featured && !a.is_headline);
+      
+      // Non-featured and non-headline articles
+      const nonFeaturedNonHeadline = articles.filter((a: any) => !a.is_featured && !a.is_headline);
 
       // Get today's articles (published today)
-      const todayNews = nonFeatured.filter((a) => {
+      const todayNews = nonFeaturedNonHeadline.filter((a) => {
         const articleDate = new Date(a.published_at || a.created_at);
         articleDate.setHours(0, 0, 0, 0);
         return articleDate.getTime() === today.getTime();
       });
 
-      // Other articles (not featured and not from today)
-      const others = nonFeatured.filter((a) => {
+      // Other articles (not featured, not headline, not from today)
+      const others = nonFeaturedNonHeadline.filter((a) => {
         const articleDate = new Date(a.published_at || a.created_at);
         articleDate.setHours(0, 0, 0, 0);
         return articleDate.getTime() !== today.getTime();
       });
 
+      setHeadlineArticle(headline);
       setFeaturedArticles(featured);
       setTodayArticles(todayNews);
       setOtherArticles(others);
     } else {
+      setHeadlineArticle(null);
       setFeaturedArticles([]);
       setTodayArticles([]);
       setOtherArticles([]);
@@ -72,6 +81,11 @@ export default function NewsHome() {
           <div className="flex flex-col xl:flex-row gap-8">
             {/* Main content column */}
             <div className="flex-1 min-w-0 space-y-10">
+              {/* Headline Section - Always on top */}
+              {headlineArticle && (
+                <HeadlineSection article={headlineArticle} />
+              )}
+
               {/* Featured Articles Carousel */}
               {featuredArticles.length > 0 && (
                 <section>

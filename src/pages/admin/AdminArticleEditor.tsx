@@ -28,6 +28,7 @@ const articleSchema = z.object({
   body: z.string().min(1, 'Conteúdo é obrigatório'),
   is_published: z.boolean(),
   is_featured: z.boolean(),
+  is_headline: z.boolean(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -61,6 +62,7 @@ export default function AdminArticleEditor() {
     body: '',
     is_published: false,
     is_featured: false,
+    is_headline: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -89,6 +91,7 @@ export default function AdminArticleEditor() {
             body: article.body,
             is_published: article.is_published,
             is_featured: (article as any).is_featured || false,
+            is_headline: (article as any).is_headline || false,
           });
         } else {
           toast.error('Artigo não encontrado');
@@ -137,6 +140,7 @@ export default function AdminArticleEditor() {
           body: formData.body,
           is_published: formData.is_published,
           is_featured: formData.is_featured,
+          is_headline: formData.is_headline,
         } as any);
         toast.success('Artigo atualizado com sucesso');
       } else {
@@ -149,6 +153,7 @@ export default function AdminArticleEditor() {
           body: formData.body,
           is_published: formData.is_published,
           is_featured: formData.is_featured,
+          is_headline: formData.is_headline,
           created_by: user?.id,
         } as any);
         toast.success('Artigo criado com sucesso');
@@ -388,6 +393,28 @@ export default function AdminArticleEditor() {
                 checked={formData.is_featured}
                 onCheckedChange={(checked) =>
                   setFormData((prev) => ({ ...prev, is_featured: checked }))
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-border">
+              <div>
+                <Label htmlFor="is_headline" className="text-base font-medium">
+                  📰 Manchete Principal
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Define este artigo como manchete única no topo da página inicial.
+                  <br />
+                  <span className="text-amber-600 dark:text-amber-400">
+                    Apenas um artigo pode ser manchete por vez.
+                  </span>
+                </p>
+              </div>
+              <Switch
+                id="is_headline"
+                checked={formData.is_headline}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, is_headline: checked }))
                 }
               />
             </div>
