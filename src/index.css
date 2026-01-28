@@ -178,7 +178,7 @@
 /* Grid layouts for news */
 @layer components {
   .news-container {
-    @apply max-w-7xl mx-auto px-4 md:px-6 lg:px-8;
+    @apply max-w-7xl mx-auto px-4 md:px-6 lg:px-8 2xl:max-w-[1600px];
   }
 
   .news-grid {
@@ -186,11 +186,11 @@
   }
 
   .news-grid-main {
-    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+    @apply grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6;
   }
 
   .news-grid-2col {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4;
   }
 
   .news-sidebar {
