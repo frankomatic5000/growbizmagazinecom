@@ -97,19 +97,18 @@ export default function NewsHome() {
             {/* Main content grid */}
             <div className="news-grid-main">
               {/* Left column - Other Articles */}
-              <div className="lg:col-span-2 space-y-8">
+              <div className="lg:col-span-2 xl:col-span-3 space-y-8">
                 {/* Other articles */}
                 {otherArticles.length > 0 && (
                   <section>
                     <h2 className="text-xl font-bold mb-4 pb-2 border-b border-border">
                       More Articles
                     </h2>
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                       {otherArticles.map((article) => (
                         <NewsCard
                           key={article.id}
                           article={article}
-                          variant="horizontal"
                         />
                       ))}
                     </div>
