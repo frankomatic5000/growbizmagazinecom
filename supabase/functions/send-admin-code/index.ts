@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const MAILERSEND_API_KEY = Deno.env.get("MAILERSEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -67,7 +67,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Send email with code using Resend REST API
+    // Send email with code using MailerSend REST API
     const emailHtml = `
       <!DOCTYPE html>
       <html>
@@ -108,22 +108,30 @@ Deno.serve(async (req: Request) => {
       </html>
     `;
 
-    const emailResponse = await fetch("https://api.resend.com/emails", {
+    const emailResponse = await fetch("https://api.mailersend.com/v1/email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Authorization": `Bearer ${MAILERSEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "GrowBiz Magazine <onboarding@resend.dev>",
-        to: [email],
+        from: {
+          email: "noreply@trial-3yxj6ljyd1xgdo2r.mlsender.net",
+          name: "GrowBiz Magazine"
+        },
+        to: [
+          {
+            email: email,
+            name: email
+          }
+        ],
         subject: "Código de Verificação - GrowBiz Admin",
         html: emailHtml,
       }),
     });
 
     if (!emailResponse.ok) {
-      const errorData = await emailResponse.json();
+      const errorData = await emailResponse.text();
       console.error("Error sending email:", errorData);
       return new Response(
         JSON.stringify({ error: "Erro ao enviar email" }),
