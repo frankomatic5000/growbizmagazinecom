@@ -4,6 +4,7 @@ import NewsFooter from '@/components/news/NewsFooter';
 import NewsCard from '@/components/news/NewsCard';
 import NewsSidebar from '@/components/news/NewsSidebar';
 import EmptyState from '@/components/news/EmptyState';
+import FeaturedCarousel from '@/components/news/FeaturedCarousel';
 import { useArticles } from '@/hooks/useArticles';
 import type { Article } from '@/hooks/useArticles';
 
@@ -69,21 +70,13 @@ export default function NewsHome() {
           <EmptyState />
         ) : (
           <>
-            {/* Featured Articles Section */}
+            {/* Featured Articles Carousel */}
             {featuredArticles.length > 0 && (
               <section className="mb-10">
                 <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-primary">
                   🌟 Featured
                 </h2>
-                {featuredArticles.length === 1 ? (
-                  <NewsCard article={featuredArticles[0]} variant="featured" />
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {featuredArticles.slice(0, 4).map((article) => (
-                      <NewsCard key={article.id} article={article} />
-                    ))}
-                  </div>
-                )}
+                <FeaturedCarousel articles={featuredArticles} />
               </section>
             )}
 
