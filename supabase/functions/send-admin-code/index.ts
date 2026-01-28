@@ -115,8 +115,8 @@ Deno.serve(async (req: Request) => {
         "Authorization": `Bearer ${MAILERSEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: {
-          email: "noreply@trial-3yxj6ljyd1xgdo2r.mlsender.net",
+      from: {
+          email: "noreply@test-3m5jgroy1ddgdpyo.mlsender.net",
           name: "GrowBiz Magazine"
         },
         to: [
