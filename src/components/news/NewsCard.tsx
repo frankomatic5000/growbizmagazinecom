@@ -31,7 +31,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
       <article className="group relative overflow-hidden rounded-lg bg-card">
         <Link to={`/article/${article.id}`} className="block">
           {/* Image */}
-          <div className="aspect-[16/7] md:aspect-[21/7] overflow-hidden">
+          <div className="aspect-[16/9] md:aspect-[21/9] overflow-hidden">
             {article.main_image ? (
               <img
                 src={article.main_image}
@@ -130,7 +130,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
     <article className="group news-card rounded-lg overflow-hidden">
       <Link to={`/article/${article.id}`} className="block">
         {/* Image */}
-        <div className="aspect-[16/8] overflow-hidden">
+        <div className="aspect-[16/10] overflow-hidden">
           {article.main_image ? (
             <img
               src={article.main_image}
