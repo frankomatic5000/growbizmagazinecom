@@ -5,7 +5,8 @@ const MAILERSEND_API_KEY = Deno.env.get("MAILERSEND_API_KEY");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 interface SendCodeRequest {
@@ -16,10 +17,18 @@ interface SendCodeRequest {
 Deno.serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
+    if (!MAILERSEND_API_KEY) {
+      console.error("MAILERSEND_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "Serviço de email não configurado" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const { email, userId }: SendCodeRequest = await req.json();
 
     if (!email || !userId) {
