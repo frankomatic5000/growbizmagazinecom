@@ -63,9 +63,10 @@ export default function NewsSidebar() {
       return `$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
     }
     if (code === 'JPY') {
-      return value.toFixed(2);
+      return `$${value.toFixed(4)}`;
     }
-    return value.toFixed(4);
+    // All other currencies show as dollars
+    return `$${value.toFixed(2)}`;
   };
 
   const formatLastUpdate = (dateString: string) => {
