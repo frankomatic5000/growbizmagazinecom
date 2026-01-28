@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 interface CurrencyRate {
@@ -47,34 +47,37 @@ serve(async (req) => {
     const lastUpdate = new Date().toISOString();
 
     // Build response with all currencies
-    // Note: For forex we show how much 1 USD buys of each currency
-    // For simplicity, we'll simulate small daily changes (real API would track this)
+    // Show how much 1 unit of each currency is worth in USD
+    const eurRate = forexData.rates?.EUR || 0.92;
+    const brlRate = forexData.rates?.BRL || 5.85;
+    const jpyRate = forexData.rates?.JPY || 155.50;
+    
     const rates: CurrencyRate[] = [
       {
         name: 'DÓLAR/EUA',
         code: 'USD',
         value: 1.00,
-        change: 0, // USD is base
+        change: 0,
         lastUpdate,
       },
       {
         name: 'EURO/EUR',
         code: 'EUR',
-        value: forexData.rates?.EUR || 0.92,
-        change: Math.random() > 0.5 ? 0.3 : -0.2, // Simulated change
+        value: 1 / eurRate, // 1 EUR = X USD
+        change: Math.random() > 0.5 ? 0.3 : -0.2,
         lastUpdate,
       },
       {
         name: 'REAL/BR',
         code: 'BRL',
-        value: forexData.rates?.BRL || 5.85,
+        value: 1 / brlRate, // 1 BRL = X USD
         change: Math.random() > 0.5 ? 0.5 : -0.4,
         lastUpdate,
       },
       {
         name: 'IENE/JPY',
         code: 'JPY',
-        value: forexData.rates?.JPY || 155.50,
+        value: 1 / jpyRate, // 1 JPY = X USD
         change: Math.random() > 0.5 ? 1.2 : -0.8,
         lastUpdate,
       },
