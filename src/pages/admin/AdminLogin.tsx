@@ -43,23 +43,27 @@ export default function AdminLogin() {
         // Need email verification
         setAuthStep('email-verify');
         setPendingEmail(user.email || '');
-        sendVerificationEmail(user.email || '');
+        sendVerificationCode(user.id, user.email || '');
       }
     }
   }, [user, isAdmin, authLoading, navigate]);
 
-  const sendVerificationEmail = async (emailAddress: string) => {
+  const sendVerificationCode = async (userId: string, emailAddress: string) => {
     try {
-      // Use Supabase's magic link as email verification
-      await supabase.auth.signInWithOtp({
-        email: emailAddress,
-        options: {
-          shouldCreateUser: false,
-        },
+      const { data, error } = await supabase.functions.invoke('send-admin-code', {
+        body: { userId, email: emailAddress },
       });
+
+      if (error) {
+        console.error('Error sending verification code:', error);
+        toast.error('Erro ao enviar código. Tente novamente.');
+        return;
+      }
+
       toast.success('Código de verificação enviado para seu email!');
     } catch (err) {
       console.error('Error sending verification:', err);
+      toast.error('Erro ao enviar código.');
     }
   };
 
@@ -152,18 +156,25 @@ export default function AdminLogin() {
       return;
     }
 
+    if (!user) {
+      setError('Sessão expirada. Faça login novamente.');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email: pendingEmail,
-        token: verificationCode,
-        type: 'email',
+      const { data, error: verifyError } = await supabase.functions.invoke('verify-admin-code', {
+        body: { 
+          userId: user.id, 
+          email: pendingEmail, 
+          code: verificationCode 
+        },
       });
 
-      if (verifyError) {
-        setError('Código inválido ou expirado. Tente novamente.');
+      if (verifyError || !data?.valid) {
+        setError(data?.error || 'Código inválido ou expirado. Tente novamente.');
         return;
       }
 
@@ -179,9 +190,10 @@ export default function AdminLogin() {
   };
 
   const handleResendCode = async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
-      await sendVerificationEmail(pendingEmail);
+      await sendVerificationCode(user.id, pendingEmail);
     } finally {
       setIsLoading(false);
     }
