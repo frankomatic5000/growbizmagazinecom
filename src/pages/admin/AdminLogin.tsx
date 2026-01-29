@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Shield, UserPlus, Mail } from 'lucide-react';
+import { Loader2, Shield, UserPlus, Mail, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
@@ -18,18 +18,20 @@ const emailSchema = z.object({
   email: z.string().email('Email inválido'),
 });
 
-type AuthStep = 'login' | 'email-verify';
+type AuthStep = 'login' | 'email-verify' | 'forgot-code' | 'new-password';
 
 export default function AdminLogin() {
   const { signIn, signUp, user, isAdmin, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [authStep, setAuthStep] = useState<AuthStep>('login');
   const [pendingEmail, setPendingEmail] = useState('');
 
@@ -71,37 +73,6 @@ export default function AdminLogin() {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
-
-    if (mode === 'forgot') {
-      const validation = emailSchema.safeParse({ email });
-      if (!validation.success) {
-        setError(validation.error.errors[0].message);
-        return;
-      }
-
-      setIsLoading(true);
-
-      try {
-        const redirectUrl = `${window.location.origin}/secure-content-editor-2026/login`;
-        
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: redirectUrl,
-        });
-
-        if (resetError) {
-          setError(resetError.message);
-          return;
-        }
-
-        setSuccessMessage('Email de recuperação enviado! Verifique sua caixa de entrada.');
-        setEmail('');
-      } catch (err) {
-        setError('Ocorreu um erro. Tente novamente.');
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
 
     const validation = loginSchema.safeParse({ email, password });
     if (!validation.success) {
@@ -145,6 +116,91 @@ export default function AdminLogin() {
       // After successful login, the useEffect will handle the email verification flow
     } catch (err) {
       setError('Ocorreu um erro. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    const validation = emailSchema.safeParse({ email });
+    if (!validation.success) {
+      setError(validation.error.errors[0].message);
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-password-reset-code', {
+        body: { email },
+      });
+
+      if (error) {
+        console.error('Error sending reset code:', error);
+        setError('Erro ao enviar código. Tente novamente.');
+        return;
+      }
+
+      setPendingEmail(email);
+      setAuthStep('forgot-code');
+      toast.success('Código enviado para seu email!');
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Erro ao enviar código.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyResetCode = async () => {
+    if (verificationCode.length !== 6) {
+      setError('O código deve ter 6 dígitos');
+      return;
+    }
+
+    // Just move to password step - we'll verify the code when setting the password
+    setError('');
+    setAuthStep('new-password');
+  };
+
+  const handleSetNewPassword = async () => {
+    if (newPassword.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError('As senhas não coincidem');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('reset-password-with-code', {
+        body: { 
+          email: pendingEmail, 
+          code: verificationCode,
+          newPassword: newPassword
+        },
+      });
+
+      if (error || !data?.success) {
+        setError(data?.error || 'Código inválido ou expirado. Tente novamente.');
+        setAuthStep('forgot-code');
+        return;
+      }
+
+      toast.success('Senha alterada com sucesso!');
+      setAuthStep('login');
+      setVerificationCode('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setEmail(pendingEmail);
+    } catch (err) {
+      setError('Erro ao alterar senha. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -199,6 +255,26 @@ export default function AdminLogin() {
     }
   };
 
+  const handleResendResetCode = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-password-reset-code', {
+        body: { email: pendingEmail },
+      });
+
+      if (error) {
+        toast.error('Erro ao reenviar código.');
+        return;
+      }
+
+      toast.success('Código reenviado!');
+    } catch (err) {
+      toast.error('Erro ao reenviar código.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -207,7 +283,175 @@ export default function AdminLogin() {
     );
   }
 
-  // Email verification step
+  // New password step
+  if (authStep === 'new-password') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted p-4">
+        <div className="w-full max-w-md">
+          <div className="admin-card">
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <KeyRound className="h-8 w-8 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold text-center">Nova Senha</h1>
+              <p className="text-muted-foreground text-center mt-2">
+                Digite sua nova senha
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Nova Senha</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="admin-input"
+                />
+                <p className="text-xs text-muted-foreground">Mínimo de 6 caracteres</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="admin-input"
+                />
+              </div>
+
+              {error && (
+                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <Button
+                onClick={handleSetNewPassword}
+                disabled={isLoading || !newPassword || !confirmPassword}
+                className="w-full"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Alterando...
+                  </>
+                ) : (
+                  'Alterar Senha'
+                )}
+              </Button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthStep('login');
+                    setVerificationCode('');
+                    setNewPassword('');
+                    setConfirmPassword('');
+                    setError('');
+                  }}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Voltar para o login
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Forgot password code verification step
+  if (authStep === 'forgot-code') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted p-4">
+        <div className="w-full max-w-md">
+          <div className="admin-card">
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Mail className="h-8 w-8 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold text-center">Verificar Código</h1>
+              <p className="text-muted-foreground text-center mt-2">
+                Enviamos um código de 6 dígitos para
+              </p>
+              <p className="font-medium text-center">{pendingEmail}</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="resetCode">Código de Verificação</Label>
+                <Input
+                  id="resetCode"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                  className="text-center text-3xl tracking-[0.5em] font-mono h-14"
+                  autoFocus
+                />
+              </div>
+
+              {error && (
+                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <Button
+                onClick={handleVerifyResetCode}
+                disabled={isLoading || verificationCode.length !== 6}
+                className="w-full"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verificando...
+                  </>
+                ) : (
+                  'Continuar'
+                )}
+              </Button>
+
+              <div className="flex flex-col gap-2 text-center">
+                <button
+                  type="button"
+                  onClick={handleResendResetCode}
+                  disabled={isLoading}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Reenviar código
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthStep('login');
+                    setVerificationCode('');
+                    setError('');
+                  }}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Voltar para o login
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Email verification step (2FA for admin login)
   if (authStep === 'email-verify' && user && isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted p-4">
@@ -280,25 +524,13 @@ export default function AdminLogin() {
   }
 
   const getTitle = () => {
-    switch (mode) {
-      case 'signup':
-        return 'Criar Conta';
-      case 'forgot':
-        return 'Recuperar Senha';
-      default:
-        return 'Acesso Restrito';
-    }
+    return mode === 'signup' ? 'Criar Conta' : 'Acesso Restrito';
   };
 
   const getDescription = () => {
-    switch (mode) {
-      case 'signup':
-        return 'Crie sua conta para solicitar acesso ao painel';
-      case 'forgot':
-        return 'Digite seu email para receber o link de recuperação';
-      default:
-        return 'Entre com suas credenciais de administrador';
-    }
+    return mode === 'signup' 
+      ? 'Crie sua conta para solicitar acesso ao painel' 
+      : 'Entre com suas credenciais de administrador';
   };
 
   return (
@@ -329,25 +561,23 @@ export default function AdminLogin() {
               />
             </div>
 
-            {mode !== 'forgot' && (
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="admin-input"
-                  required
-                />
-                {mode === 'signup' && (
-                  <p className="text-xs text-muted-foreground">
-                    Mínimo de 6 caracteres
-                  </p>
-                )}
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="admin-input"
+                required
+              />
+              {mode === 'signup' && (
+                <p className="text-xs text-muted-foreground">
+                  Mínimo de 6 caracteres
+                </p>
+              )}
+            </div>
 
             {error && (
               <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
@@ -369,10 +599,8 @@ export default function AdminLogin() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {mode === 'forgot' ? 'Enviando...' : mode === 'signup' ? 'Criando...' : 'Entrando...'}
+                  {mode === 'signup' ? 'Criando...' : 'Entrando...'}
                 </>
-              ) : mode === 'forgot' ? (
-                'Enviar Link de Recuperação'
               ) : mode === 'signup' ? (
                 <>
                   <UserPlus className="mr-2 h-4 w-4" />
@@ -388,11 +616,8 @@ export default function AdminLogin() {
                 <>
                   <button
                     type="button"
-                    onClick={() => {
-                      setMode('forgot');
-                      setError('');
-                      setSuccessMessage('');
-                    }}
+                    onClick={handleForgotPassword}
+                    disabled={isLoading}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     Esqueci minha senha
@@ -410,7 +635,7 @@ export default function AdminLogin() {
                   </button>
                 </>
               )}
-              {mode !== 'login' && (
+              {mode === 'signup' && (
                 <button
                   type="button"
                   onClick={() => {
