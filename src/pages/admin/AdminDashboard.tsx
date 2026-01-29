@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useArticles } from '@/hooks/useArticles';
+import { supabase } from '@/integrations/supabase/client';
 import type { Article } from '@/hooks/useArticles';
 import { Button } from '@/components/ui/button';
 import {
@@ -78,13 +79,10 @@ export default function AdminDashboard() {
       setIsLoading(true);
       try {
         // Fetch all articles (including unpublished)
-        const { data, error } = await import('@/integrations/supabase/client').then(
-          (m) =>
-            m.supabase
-              .from('articles')
-              .select('*')
-              .order('created_at', { ascending: false })
-        );
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setArticles(data || []);
