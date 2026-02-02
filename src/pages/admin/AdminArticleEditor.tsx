@@ -27,7 +27,7 @@ const articleSchema = z.object({
   author: z.string().min(1, 'Autor é obrigatório').max(100, 'Nome muito longo'),
   category: z.enum(['culture_arts', 'education', 'entrepreneurship_business', 'society_humanity', 'psychology_wellbeing', 'sustainability_future', 'lifestyle_purpose', 'events', 'opinion_essays', 'biographies']),
   main_image: z.string().url('URL de imagem inválida').optional().or(z.literal('')),
-  body: z.string().min(1, 'Conteúdo é obrigatório'),
+  body: z.string(), // Body can be empty when using magazine layout
   is_published: z.boolean(),
   is_featured: z.boolean(),
   is_headline: z.boolean(),
@@ -146,6 +146,12 @@ export default function AdminArticleEditor() {
     // Validate magazine layout
     if (formData.is_magazine_layout && magazineConfig.pages.length === 0) {
       toast.error('Adicione pelo menos uma página para o modo revista');
+      return;
+    }
+
+    // Validate body when not using magazine layout
+    if (!formData.is_magazine_layout && !formData.body.trim()) {
+      setErrors({ body: 'Conteúdo é obrigatório' });
       return;
     }
 
