@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, forwardRef } from 'react';
 import HTMLFlipBook from 'react-pageflip';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,18 @@ interface MagazineFlipbookProps {
   mainImage?: string;
 }
 
+// Wrapper para as páginas - necessário para react-pageflip
+const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; className?: string }>(
+  ({ children, className = '' }, ref) => {
+    return (
+      <div ref={ref} className={`magazine-page ${className}`}>
+        {children}
+      </div>
+    );
+  }
+);
+Page.displayName = 'Page';
+
 export function MagazineFlipbook({
   config,
   articleTitle,
@@ -20,98 +32,32 @@ export function MagazineFlipbook({
   mainImage
 }: MagazineFlipbookProps) {
   const bookRef = useRef<any>(null);
-  const [currentPage, setCurrentPage] = useState(0);
+  const fullscreenBookRef = useRef<any>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handlePrevPage = useCallback(() => {
-    bookRef.current?.pageFlip()?.flipPrev();
-  }, []);
+    if (isFullscreen) {
+      fullscreenBookRef.current?.pageFlip()?.flipPrev();
+    } else {
+      bookRef.current?.pageFlip()?.flipPrev();
+    }
+  }, [isFullscreen]);
 
   const handleNextPage = useCallback(() => {
-    bookRef.current?.pageFlip()?.flipNext();
-  }, []);
+    if (isFullscreen) {
+      fullscreenBookRef.current?.pageFlip()?.flipNext();
+    } else {
+      bookRef.current?.pageFlip()?.flipNext();
+    }
+  }, [isFullscreen]);
 
-  const handlePageFlip = useCallback((e: any) => {
-    setCurrentPage(e.data);
-  }, []);
-
-  const totalPages = config.pages.length + 2; // +2 for cover and back cover
-
-  const FlipbookContent = ({ width, height, isFullscreen = false }: { width: number; height: number; isFullscreen?: boolean }) => (
-    <div className="relative select-none">
-      {/* @ts-ignore - react-pageflip types issue */}
-      <HTMLFlipBook
-        ref={bookRef}
-        width={width}
-        height={height}
-        size="stretch"
-        minWidth={300}
-        maxWidth={600}
-        minHeight={400}
-        maxHeight={800}
-        showCover={true}
-        mobileScrollSupport={true}
-        className="magazine-flipbook"
-        style={{}}
-        startPage={0}
-        drawShadow={true}
-        flippingTime={800}
-        usePortrait={true}
-        startZIndex={0}
-        autoSize={true}
-        maxShadowOpacity={0.5}
-        showPageCorners={true}
-        disableFlipByClick={false}
-        useMouseEvents={true}
-        swipeDistance={30}
-        clickEventForward={true}
-        onFlip={handlePageFlip}
-      >
-        {/* Cover Page */}
-        <div className="magazine-page relative overflow-hidden" data-density="hard">
-          {mainImage ? (
-            <>
-              <img
-                src={mainImage}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-                draggable={false}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-            </>
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/70" />
-          )}
-          <div className="relative z-10 flex flex-col items-center justify-center h-full p-8 text-white text-center">
-            <h1 className={`font-bold mb-4 font-serif leading-tight ${isFullscreen ? 'text-3xl md:text-5xl' : 'text-xl md:text-3xl'}`}>
-              {articleTitle}
-            </h1>
-            {articleSubtitle && (
-              <p className={`opacity-90 font-serif italic max-w-md ${isFullscreen ? 'text-lg md:text-2xl' : 'text-sm md:text-base'}`}>
-                {articleSubtitle}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Content Pages */}
-        {config.pages.map((page) => (
-          <div key={page.id} className="magazine-page bg-white" data-density="soft">
-            <MagazinePageRenderer page={page} />
-          </div>
-        ))}
-
-        {/* Back Cover */}
-        <div className="magazine-page bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center p-8" data-density="hard">
-          <div className="text-center text-white/50">
-            <div className="w-16 h-0.5 bg-white/30 mx-auto mb-4" />
-            <p className="font-serif italic text-sm">Fim da leitura</p>
-            <div className="w-16 h-0.5 bg-white/30 mx-auto mt-4" />
-          </div>
-        </div>
-      </HTMLFlipBook>
-    </div>
-  );
+  if (config.pages.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-neutral-900 text-white rounded-xl">
+        <p>Nenhuma página para visualizar</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -133,33 +79,96 @@ export function MagazineFlipbook({
           </Button>
         </div>
 
-        {/* Flipbook */}
-        <div className="flex items-center justify-center py-8 px-4">
-          <FlipbookContent width={320} height={450} isFullscreen={false} />
+        {/* Flipbook Container */}
+        <div className="flex items-center justify-center py-8 px-4 overflow-hidden">
+          <div className="relative">
+            {/* @ts-ignore - react-pageflip types issue */}
+            <HTMLFlipBook
+              ref={bookRef}
+              width={320}
+              height={450}
+              size="stretch"
+              minWidth={300}
+              maxWidth={500}
+              minHeight={400}
+              maxHeight={700}
+              showCover={true}
+              mobileScrollSupport={true}
+              className="magazine-flipbook"
+              style={{}}
+              startPage={0}
+              drawShadow={true}
+              flippingTime={800}
+              usePortrait={true}
+              startZIndex={0}
+              autoSize={true}
+              maxShadowOpacity={0.5}
+              showPageCorners={true}
+              disableFlipByClick={false}
+              useMouseEvents={true}
+              swipeDistance={30}
+              clickEventForward={true}
+            >
+              {/* Cover Page */}
+              <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
+                {mainImage ? (
+                  <>
+                    <img
+                      src={mainImage}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover"
+                      draggable={false}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+                  </>
+                ) : null}
+                <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-white text-center">
+                  <h1 className="text-xl md:text-2xl font-bold mb-3 font-serif leading-tight">
+                    {articleTitle}
+                  </h1>
+                  {articleSubtitle && (
+                    <p className="text-sm opacity-90 font-serif italic max-w-xs">
+                      {articleSubtitle}
+                    </p>
+                  )}
+                </div>
+              </Page>
+
+              {/* Content Pages */}
+              {config.pages.map((page) => (
+                <Page key={page.id} className="bg-white">
+                  <MagazinePageRenderer page={page} />
+                </Page>
+              ))}
+
+              {/* Back Cover */}
+              <Page className="bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center p-8">
+                <div className="text-center text-white/60">
+                  <p className="font-serif italic">Fim</p>
+                </div>
+              </Page>
+            </HTMLFlipBook>
+          </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-center gap-6 px-4 py-4 bg-neutral-800/60">
+        {/* Navigation Controls */}
+        <div className="flex items-center justify-center gap-4 px-4 py-3 bg-neutral-800/60 border-t border-neutral-700">
           <Button
             variant="ghost"
             size="icon"
             onClick={handlePrevPage}
-            disabled={currentPage === 0}
-            className="text-white hover:bg-neutral-700 disabled:opacity-30"
+            className="text-white hover:bg-neutral-700"
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
-          
-          <span className="text-white/60 text-sm min-w-[100px] text-center">
-            Página {currentPage + 1} de {totalPages}
+          <span className="text-white/60 text-sm">
+            Clique nas bordas ou arraste para folhear
           </span>
-          
           <Button
             variant="ghost"
             size="icon"
             onClick={handleNextPage}
-            disabled={currentPage >= totalPages - 1}
-            className="text-white hover:bg-neutral-700 disabled:opacity-30"
+            className="text-white hover:bg-neutral-700"
           >
             <ChevronRight className="h-6 w-6" />
           </Button>
@@ -170,7 +179,7 @@ export function MagazineFlipbook({
       <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
         <DialogContent className="max-w-[100vw] w-screen h-screen max-h-screen p-0 bg-neutral-900 border-none">
           <DialogTitle className="sr-only">Revista em Tela Cheia</DialogTitle>
-          <DialogDescription className="sr-only">Visualize a revista em modo de tela cheia com navegação por páginas</DialogDescription>
+          <DialogDescription className="sr-only">Visualize a revista em modo de tela cheia</DialogDescription>
           
           <div className="flex flex-col h-full">
             {/* Fullscreen Header */}
@@ -191,7 +200,74 @@ export function MagazineFlipbook({
 
             {/* Fullscreen Flipbook */}
             <div className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-hidden">
-              <FlipbookContent width={550} height={750} isFullscreen={true} />
+              <div className="relative">
+                {/* @ts-ignore - react-pageflip types issue */}
+                <HTMLFlipBook
+                  ref={fullscreenBookRef}
+                  width={500}
+                  height={700}
+                  size="stretch"
+                  minWidth={400}
+                  maxWidth={700}
+                  minHeight={500}
+                  maxHeight={900}
+                  showCover={true}
+                  mobileScrollSupport={true}
+                  className="magazine-flipbook"
+                  style={{}}
+                  startPage={0}
+                  drawShadow={true}
+                  flippingTime={800}
+                  usePortrait={true}
+                  startZIndex={0}
+                  autoSize={true}
+                  maxShadowOpacity={0.5}
+                  showPageCorners={true}
+                  disableFlipByClick={false}
+                  useMouseEvents={true}
+                  swipeDistance={30}
+                  clickEventForward={true}
+                >
+                  {/* Cover Page */}
+                  <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
+                    {mainImage ? (
+                      <>
+                        <img
+                          src={mainImage}
+                          alt=""
+                          className="absolute inset-0 w-full h-full object-cover"
+                          draggable={false}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+                      </>
+                    ) : null}
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full p-8 text-white text-center">
+                      <h1 className="text-3xl md:text-4xl font-bold mb-4 font-serif leading-tight">
+                        {articleTitle}
+                      </h1>
+                      {articleSubtitle && (
+                        <p className="text-lg opacity-90 font-serif italic max-w-md">
+                          {articleSubtitle}
+                        </p>
+                      )}
+                    </div>
+                  </Page>
+
+                  {/* Content Pages */}
+                  {config.pages.map((page) => (
+                    <Page key={page.id} className="bg-white">
+                      <MagazinePageRenderer page={page} />
+                    </Page>
+                  ))}
+
+                  {/* Back Cover */}
+                  <Page className="bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center p-8">
+                    <div className="text-center text-white/60">
+                      <p className="font-serif italic">Fim</p>
+                    </div>
+                  </Page>
+                </HTMLFlipBook>
+              </div>
             </div>
 
             {/* Fullscreen Navigation */}
@@ -200,23 +276,21 @@ export function MagazineFlipbook({
                 variant="ghost"
                 size="lg"
                 onClick={handlePrevPage}
-                disabled={currentPage === 0}
-                className="text-white hover:bg-neutral-700 disabled:opacity-30"
+                className="text-white hover:bg-neutral-700"
               >
                 <ChevronLeft className="h-6 w-6 mr-2" />
                 Anterior
               </Button>
               
-              <span className="text-white/60 text-base">
-                {currentPage + 1} / {totalPages}
+              <span className="text-white/60 text-sm">
+                Clique nas bordas ou arraste para folhear
               </span>
               
               <Button
                 variant="ghost"
                 size="lg"
                 onClick={handleNextPage}
-                disabled={currentPage >= totalPages - 1}
-                className="text-white hover:bg-neutral-700 disabled:opacity-30"
+                className="text-white hover:bg-neutral-700"
               >
                 Próxima
                 <ChevronRight className="h-6 w-6 ml-2" />
