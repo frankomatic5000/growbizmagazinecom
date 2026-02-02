@@ -160,12 +160,7 @@ export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
         return (
           <div className="h-full p-8 overflow-auto" style={pageStyle}>
             <div className="prose prose-sm max-w-none">
-              {paragraphs.length > 0 && (
-                <p className="font-serif text-lg leading-relaxed first-letter:text-5xl first-letter:font-bold first-letter:float-left first-letter:mr-3 first-letter:mt-1">
-                  {paragraphs[0]}
-                </p>
-              )}
-              {paragraphs.slice(1).map((p, i) => (
+              {paragraphs.map((p, i) => (
                 <p key={i} className="font-serif leading-relaxed mb-4 text-sm">
                   {p}
                 </p>
