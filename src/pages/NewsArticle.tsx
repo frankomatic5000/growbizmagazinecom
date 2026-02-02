@@ -9,6 +9,8 @@ import NewsSidebar from '@/components/news/NewsSidebar';
 import { useArticles } from '@/hooks/useArticles';
 import type { Article } from '@/hooks/useArticles';
 import { Button } from '@/components/ui/button';
+import { MagazineFlipbook } from '@/components/magazine/MagazineFlipbook';
+import type { MagazineConfig, MagazinePage } from '@/types/magazine';
 
 const categoryLabels: Record<string, string> = {
   culture_arts: 'Culture & Arts',
@@ -98,6 +100,148 @@ export default function NewsArticle() {
     locale: enUS,
   });
 
+  // Check if this is a magazine layout article
+  const isMagazineLayout = (article as any).is_magazine_layout === true;
+  const magazinePages = (article as any).magazine_pages as MagazinePage[] | undefined;
+  const hasMagazineContent = isMagazineLayout && magazinePages && magazinePages.length > 0;
+
+  const magazineConfig: MagazineConfig = {
+    pages: magazinePages || []
+  };
+
+  // For magazine layout, render full-width
+  if (hasMagazineContent) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NewsHeader />
+
+        <main className="news-container py-8">
+          {/* Back button */}
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Link>
+
+          {/* Category */}
+          <span className="news-category mb-4 inline-block">
+            {categoryLabels[article.category] || article.category}
+          </span>
+
+          {/* Title */}
+          <h1 className="news-headline text-3xl md:text-4xl lg:text-5xl mb-4">
+            {article.title}
+          </h1>
+
+          {/* Subtitle */}
+          {article.subtitle && (
+            <p className="text-xl text-muted-foreground mb-6">
+              {article.subtitle}
+            </p>
+          )}
+
+          {/* Meta info */}
+          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b border-border">
+            <span className="font-medium text-foreground">{article.author}</span>
+            <span className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              {formattedDate}
+            </span>
+            <span className="flex items-center gap-1">
+              <Eye className="h-4 w-4" />
+              {article.view_count} views
+            </span>
+          </div>
+
+          {/* Share buttons */}
+          <div className="flex items-center gap-3 mb-8">
+            <span className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Share2 className="h-4 w-4" />
+              Compartilhar:
+            </span>
+            <a
+              href={shareLinks.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-80 transition-opacity"
+              aria-label="Share on Facebook"
+            >
+              <Facebook className="h-4 w-4" />
+            </a>
+            <a
+              href={shareLinks.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1DA1F2] text-white hover:opacity-80 transition-opacity"
+              aria-label="Share on Twitter"
+            >
+              <Twitter className="h-4 w-4" />
+            </a>
+            <a
+              href={shareLinks.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-[#0A66C2] text-white hover:opacity-80 transition-opacity"
+              aria-label="Share on LinkedIn"
+            >
+              <Linkedin className="h-4 w-4" />
+            </a>
+          </div>
+
+          {/* Magazine Flipbook */}
+          <MagazineFlipbook
+            config={magazineConfig}
+            articleTitle={article.title}
+            articleSubtitle={article.subtitle || undefined}
+            mainImage={article.main_image || undefined}
+          />
+
+          {/* Share buttons bottom */}
+          <div className="mt-12 pt-6 border-t border-border">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Share2 className="h-4 w-4" />
+                Compartilhar:
+              </span>
+              <a
+                href={shareLinks.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-80 transition-opacity"
+                aria-label="Share on Facebook"
+              >
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a
+                href={shareLinks.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1DA1F2] text-white hover:opacity-80 transition-opacity"
+                aria-label="Share on Twitter"
+              >
+                <Twitter className="h-4 w-4" />
+              </a>
+              <a
+                href={shareLinks.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#0A66C2] text-white hover:opacity-80 transition-opacity"
+                aria-label="Share on LinkedIn"
+              >
+                <Linkedin className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </main>
+
+        <NewsFooter />
+      </div>
+    );
+  }
+
+  // Standard article layout
   return (
     <div className="min-h-screen bg-background">
       <NewsHeader />
