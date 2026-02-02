@@ -108,44 +108,49 @@ export function MagazinePageEditor({
           
           <div className="flex items-center gap-1">
             <Button
+              type="button"
               variant="ghost"
               size="icon"
-              onClick={onMoveUp}
+              onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
               disabled={pageIndex === 0}
               title="Mover para cima"
             >
               <ChevronUp className="h-4 w-4" />
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="icon"
-              onClick={onMoveDown}
+              onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
               disabled={pageIndex === totalPages - 1}
               title="Mover para baixo"
             >
               <ChevronDown className="h-4 w-4" />
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="icon"
-              onClick={onDuplicate}
+              onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
               title="Duplicar página"
             >
               <Copy className="h-4 w-4" />
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="icon"
-              onClick={onDelete}
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
               className="text-destructive hover:text-destructive"
               title="Excluir página"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
+              onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
             >
               {isExpanded ? 'Recolher' : 'Expandir'}
             </Button>
@@ -203,10 +208,11 @@ export function MagazinePageEditor({
                         </Badge>
                         {image && (
                           <Button
+                            type="button"
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 text-destructive"
-                            onClick={() => handleRemoveImage(image.id)}
+                            onClick={(e) => { e.stopPropagation(); handleRemoveImage(image.id); }}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
@@ -257,9 +263,10 @@ export function MagazinePageEditor({
                         </div>
                       ) : (
                         <Button
+                          type="button"
                           variant="outline"
                           className="w-full"
-                          onClick={() => handleAddImage(position)}
+                          onClick={(e) => { e.stopPropagation(); handleAddImage(position); }}
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           Adicionar Imagem
