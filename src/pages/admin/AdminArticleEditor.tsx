@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { z } from 'zod';
-import { ArrowLeft, Save, Loader2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Image as ImageIcon, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useArticles } from '@/hooks/useArticles';
 import type { ArticleCategory } from '@/hooks/useArticles';
@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { MagazineBuilder } from '@/components/admin/magazine/MagazineBuilder';
+import type { MagazineConfig } from '@/types/magazine';
 
 const articleSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório').max(200, 'Título muito longo'),
@@ -29,6 +31,7 @@ const articleSchema = z.object({
   is_published: z.boolean(),
   is_featured: z.boolean(),
   is_headline: z.boolean(),
+  is_magazine_layout: z.boolean(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -63,7 +66,13 @@ export default function AdminArticleEditor() {
     is_published: false,
     is_featured: false,
     is_headline: false,
+    is_magazine_layout: false,
   });
+  
+  const [magazineConfig, setMagazineConfig] = useState<MagazineConfig>({
+    pages: []
+  });
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(isEditing);
@@ -92,7 +101,14 @@ export default function AdminArticleEditor() {
             is_published: article.is_published,
             is_featured: (article as any).is_featured || false,
             is_headline: (article as any).is_headline || false,
+            is_magazine_layout: (article as any).is_magazine_layout || false,
           });
+          
+          // Load magazine pages if available
+          const magazinePages = (article as any).magazine_pages;
+          if (magazinePages && Array.isArray(magazinePages)) {
+            setMagazineConfig({ pages: magazinePages });
+          }
         } else {
           toast.error('Artigo não encontrado');
           navigate('/secure-content-editor-2026');
@@ -127,33 +143,35 @@ export default function AdminArticleEditor() {
       return;
     }
 
+    // Validate magazine layout
+    if (formData.is_magazine_layout && magazineConfig.pages.length === 0) {
+      toast.error('Adicione pelo menos uma página para o modo revista');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      const articleData = {
+        title: formData.title,
+        subtitle: formData.subtitle || null,
+        author: formData.author,
+        category: formData.category,
+        main_image: formData.main_image || null,
+        body: formData.body,
+        is_published: formData.is_published,
+        is_featured: formData.is_featured,
+        is_headline: formData.is_headline,
+        is_magazine_layout: formData.is_magazine_layout,
+        magazine_pages: formData.is_magazine_layout ? magazineConfig.pages : [],
+      };
+
       if (isEditing && id) {
-        await updateArticle(id, {
-          title: formData.title,
-          subtitle: formData.subtitle || null,
-          author: formData.author,
-          category: formData.category,
-          main_image: formData.main_image || null,
-          body: formData.body,
-          is_published: formData.is_published,
-          is_featured: formData.is_featured,
-          is_headline: formData.is_headline,
-        } as any);
+        await updateArticle(id, articleData as any);
         toast.success('Artigo atualizado com sucesso');
       } else {
         await createArticle({
-          title: formData.title,
-          subtitle: formData.subtitle || null,
-          author: formData.author,
-          category: formData.category,
-          main_image: formData.main_image || null,
-          body: formData.body,
-          is_published: formData.is_published,
-          is_featured: formData.is_featured,
-          is_headline: formData.is_headline,
+          ...articleData,
           created_by: user?.id,
         } as any);
         toast.success('Artigo criado com sucesso');
@@ -180,7 +198,7 @@ export default function AdminArticleEditor() {
     <div className="min-h-screen bg-muted">
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               to="/secure-content-editor-2026"
@@ -209,7 +227,7 @@ export default function AdminArticleEditor() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div className="admin-card space-y-4">
@@ -337,27 +355,63 @@ export default function AdminArticleEditor() {
             )}
           </div>
 
-          {/* Body */}
-          <div className="admin-card space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="body">Conteúdo *</Label>
-              <Textarea
-                id="body"
-                value={formData.body}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, body: e.target.value }))
+          {/* Magazine Layout Toggle */}
+          <div className="admin-card">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-5 w-5 text-primary" />
+                <div>
+                  <Label htmlFor="is_magazine_layout" className="text-base font-medium">
+                    📖 Modo Revista
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Ative para criar um layout de revista com múltiplas páginas e efeito de folhear.
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="is_magazine_layout"
+                checked={formData.is_magazine_layout}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, is_magazine_layout: checked }))
                 }
-                placeholder="Digite o conteúdo da notícia. Use duas quebras de linha para criar parágrafos."
-                className="admin-textarea min-h-[400px]"
               />
-              {errors.body && (
-                <p className="text-sm text-destructive">{errors.body}</p>
-              )}
-              <p className="text-sm text-muted-foreground">
-                Dica: Use duas quebras de linha para separar parágrafos.
-              </p>
             </div>
           </div>
+
+          {/* Magazine Builder */}
+          {formData.is_magazine_layout && (
+            <MagazineBuilder
+              config={magazineConfig}
+              onChange={setMagazineConfig}
+              articleTitle={formData.title}
+              articleSubtitle={formData.subtitle}
+            />
+          )}
+
+          {/* Body - Only shown when not in magazine mode */}
+          {!formData.is_magazine_layout && (
+            <div className="admin-card space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="body">Conteúdo *</Label>
+                <Textarea
+                  id="body"
+                  value={formData.body}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, body: e.target.value }))
+                  }
+                  placeholder="Digite o conteúdo da notícia. Use duas quebras de linha para criar parágrafos."
+                  className="admin-textarea min-h-[400px]"
+                />
+                {errors.body && (
+                  <p className="text-sm text-destructive">{errors.body}</p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Dica: Use duas quebras de linha para separar parágrafos.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Publish toggle */}
           <div className="admin-card space-y-4">

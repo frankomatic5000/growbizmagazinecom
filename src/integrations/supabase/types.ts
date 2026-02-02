@@ -54,7 +54,9 @@ export type Database = {
           id: string
           is_featured: boolean
           is_headline: boolean
+          is_magazine_layout: boolean
           is_published: boolean
+          magazine_pages: Json | null
           main_image: string | null
           published_at: string | null
           subtitle: string | null
@@ -71,7 +73,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_headline?: boolean
+          is_magazine_layout?: boolean
           is_published?: boolean
+          magazine_pages?: Json | null
           main_image?: string | null
           published_at?: string | null
           subtitle?: string | null
@@ -88,7 +92,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_headline?: boolean
+          is_magazine_layout?: boolean
           is_published?: boolean
+          magazine_pages?: Json | null
           main_image?: string | null
           published_at?: string | null
           subtitle?: string | null

@@ -250,3 +250,60 @@
     @apply bg-muted/50;
   }
 }
+
+/* Magazine Flipbook styles */
+@layer components {
+  .magazine-flipbook {
+    @apply mx-auto;
+  }
+
+  .magazine-page {
+    @apply relative overflow-hidden;
+    background: linear-gradient(to right, #f5f5f5 0%, #ffffff 5%, #ffffff 95%, #f0f0f0 100%);
+    box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .magazine-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .magazine-page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.03), transparent);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* Magazine typography */
+  .magazine-page .prose {
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+
+  .magazine-page .prose p {
+    text-align: justify;
+    hyphens: auto;
+    line-height: 1.7;
+  }
+
+  .magazine-page .prose p:first-of-type::first-letter {
+    float: left;
+    font-size: 3.5em;
+    line-height: 0.8;
+    padding-right: 0.1em;
+    font-weight: bold;
+    color: hsl(var(--primary));
+  }
+}
