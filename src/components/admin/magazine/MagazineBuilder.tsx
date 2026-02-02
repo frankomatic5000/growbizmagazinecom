@@ -101,7 +101,12 @@ export function MagazineBuilder({
           <div className="flex gap-2">
             <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" disabled={config.pages.length === 0}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  disabled={config.pages.length === 0}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Eye className="h-4 w-4 mr-2" />
                   Pré-visualizar
                 </Button>
@@ -127,7 +132,7 @@ export function MagazineBuilder({
             <p className="text-muted-foreground mb-4">
               Comece adicionando a primeira página da sua revista
             </p>
-            <Button onClick={handleAddPage}>
+            <Button type="button" onClick={(e) => { e.stopPropagation(); handleAddPage(); }}>
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Primeira Página
             </Button>
@@ -156,7 +161,7 @@ export function MagazineBuilder({
         )}
 
         {config.pages.length > 0 && (
-          <Button onClick={handleAddPage} variant="outline" className="w-full">
+          <Button type="button" onClick={(e) => { e.stopPropagation(); handleAddPage(); }} variant="outline" className="w-full">
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Nova Página
           </Button>
