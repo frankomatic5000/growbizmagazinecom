@@ -316,15 +316,6 @@
     line-height: 1.7;
   }
 
-  .magazine-page .prose p:first-of-type::first-letter {
-    float: left;
-    font-size: 3em;
-    line-height: 0.85;
-    padding-right: 0.08em;
-    font-weight: bold;
-    color: hsl(var(--primary));
-  }
-
   /* Flipbook navigation hint */
   .magazine-flipbook-hint {
     animation: pulse-hint 2s ease-in-out infinite;
