@@ -133,23 +133,26 @@ export function MagazineBuilder({
             </Button>
           </div>
         ) : (
-          <ScrollArea className="max-h-[600px]">
-            <div className="space-y-4 pr-4">
-              {config.pages.map((page, index) => (
-                <MagazinePageEditor
-                  key={page.id}
-                  page={page}
-                  pageIndex={index}
-                  totalPages={config.pages.length}
-                  onChange={(updatedPage) => handleUpdatePage(index, updatedPage)}
-                  onDelete={() => handleDeletePage(index)}
-                  onMoveUp={() => handleMovePage(index, 'up')}
-                  onMoveDown={() => handleMovePage(index, 'down')}
-                  onDuplicate={() => handleDuplicatePage(index)}
-                />
-              ))}
-            </div>
-          </ScrollArea>
+          <div className="relative">
+            <ScrollArea className="h-[70vh] max-h-[800px] border border-border rounded-lg">
+              <div className="space-y-4 p-4">
+                {config.pages.map((page, index) => (
+                  <MagazinePageEditor
+                    key={page.id}
+                    page={page}
+                    pageIndex={index}
+                    totalPages={config.pages.length}
+                    onChange={(updatedPage) => handleUpdatePage(index, updatedPage)}
+                    onDelete={() => handleDeletePage(index)}
+                    onMoveUp={() => handleMovePage(index, 'up')}
+                    onMoveDown={() => handleMovePage(index, 'down')}
+                    onDuplicate={() => handleDuplicatePage(index)}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
+            <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-muted/50 to-transparent pointer-events-none rounded-r-lg" />
+          </div>
         )}
 
         {config.pages.length > 0 && (
