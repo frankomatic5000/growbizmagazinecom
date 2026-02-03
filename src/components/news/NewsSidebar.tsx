@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { TrendingUp, ArrowUp, ArrowDown } from 'lucide-react';
-import { useArticles } from '@/hooks/useArticles';
-import type { Article } from '@/hooks/useArticles';
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { TrendingUp, ArrowUp, ArrowDown } from "lucide-react";
+import { useArticles } from "@/hooks/useArticles";
+import type { Article } from "@/hooks/useArticles";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CurrencyRate {
   name: string;
@@ -33,19 +33,19 @@ export default function NewsSidebar() {
   const fetchRates = async () => {
     setRatesLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('get-currency-rates');
-      
+      const { data, error } = await supabase.functions.invoke("get-currency-rates");
+
       if (error) {
-        console.error('Error fetching rates:', error);
+        console.error("Error fetching rates:", error);
         return;
       }
-      
+
       if (data?.rates) {
         setRates(data.rates);
         setLastUpdate(data.lastUpdate);
       }
     } catch (err) {
-      console.error('Failed to fetch currency rates:', err);
+      console.error("Failed to fetch currency rates:", err);
     } finally {
       setRatesLoading(false);
     }
@@ -56,10 +56,10 @@ export default function NewsSidebar() {
   }, []);
 
   const formatValue = (code: string, value: number) => {
-    if (code === 'BTC') {
-      return `$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+    if (code === "BTC") {
+      return `$${value.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
     }
-    if (code === 'JPY') {
+    if (code === "JPY") {
       return `$${value.toFixed(4)}`;
     }
     // All other currencies show as dollars
@@ -67,18 +67,18 @@ export default function NewsSidebar() {
   };
 
   const formatChange = (change: number) => {
-    const sign = change >= 0 ? '+' : '';
+    const sign = change >= 0 ? "+" : "";
     return `${sign}${change.toFixed(2)}%`;
   };
 
   const formatLastUpdate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -88,7 +88,7 @@ export default function NewsSidebar() {
       <div className="news-sidebar">
         <h2 className="flex items-center gap-2 text-lg font-bold mb-4">
           <TrendingUp className="h-5 w-5 text-primary" />
-          Mais Lidas
+          Most Read
         </h2>
         {isLoading ? (
           <div className="space-y-4">
@@ -103,10 +103,7 @@ export default function NewsSidebar() {
           <ol className="space-y-4">
             {mostRead.map((article, index) => (
               <li key={article.id} className="group">
-                <Link
-                  to={`/article/${article.id}`}
-                  className="flex gap-3 items-start"
-                >
+                <Link to={`/article/${article.id}`} className="flex gap-3 items-start">
                   <span className="text-2xl font-bold text-primary/40 group-hover:text-primary transition-colors">
                     {index + 1}
                   </span>
@@ -114,25 +111,21 @@ export default function NewsSidebar() {
                     <h3 className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
                       {article.title}
                     </h3>
-                    <span className="text-xs text-muted-foreground">
-                      {article.view_count} visualizações
-                    </span>
+                    <span className="text-xs text-muted-foreground">{article.view_count} visualizações</span>
                   </div>
                 </Link>
               </li>
             ))}
           </ol>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            Nenhum artigo publicado ainda.
-          </p>
+          <p className="text-sm text-muted-foreground">Nenhum artigo publicado ainda.</p>
         )}
       </div>
 
       {/* Markets */}
       <div className="news-sidebar">
         <h2 className="text-lg font-bold mb-4">Mercados</h2>
-        
+
         {ratesLoading && rates.length === 0 ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
@@ -148,23 +141,19 @@ export default function NewsSidebar() {
               <div
                 key={rate.code}
                 className={`flex justify-between items-center py-2 ${
-                  index < rates.length - 1 ? 'border-b border-border' : ''
+                  index < rates.length - 1 ? "border-b border-border" : ""
                 }`}
               >
                 <span className="font-medium text-sm">{rate.name}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">
-                    {formatValue(rate.code, rate.value)}
-                  </span>
+                  <span className="text-sm font-semibold">{formatValue(rate.code, rate.value)}</span>
                   {rate.change !== 0 && (
-                    <div className={`flex items-center gap-0.5 text-xs ${
-                      rate.change > 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {rate.change > 0 ? (
-                        <ArrowUp className="h-3 w-3" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3" />
-                      )}
+                    <div
+                      className={`flex items-center gap-0.5 text-xs ${
+                        rate.change > 0 ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {rate.change > 0 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
                       <span>{formatChange(rate.change)}</span>
                     </div>
                   )}
@@ -173,11 +162,9 @@ export default function NewsSidebar() {
             ))}
           </div>
         )}
-        
+
         {lastUpdate && (
-          <p className="text-xs text-muted-foreground mt-3">
-            Última atualização: {formatLastUpdate(lastUpdate)}
-          </p>
+          <p className="text-xs text-muted-foreground mt-3">Última atualização: {formatLastUpdate(lastUpdate)}</p>
         )}
       </div>
     </aside>
