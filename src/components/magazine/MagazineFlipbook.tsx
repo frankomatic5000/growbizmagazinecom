@@ -49,7 +49,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   if (config.pages.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 bg-neutral-900 text-white rounded-xl">
-        <p>Nenhuma página para visualizar</p>
+        <p>No pages to view</p>
       </div>
     );
   }
@@ -68,7 +68,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
             className="text-white/70 hover:text-white hover:bg-neutral-700"
           >
             <Maximize2 className="h-4 w-4 mr-2" />
-            Tela Cheia
+            Full Screen
           </Button>
         </div>
 
@@ -145,7 +145,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
           <Button variant="ghost" size="icon" onClick={handlePrevPage} className="text-white hover:bg-neutral-700">
             <ChevronLeft className="h-6 w-6" />
           </Button>
-          <span className="text-white/60 text-sm">Clique nas bordas ou arraste para folhear</span>
+          <span className="text-white/60 text-sm">Click on the edges or drag to browse</span>
           <Button variant="ghost" size="icon" onClick={handleNextPage} className="text-white hover:bg-neutral-700">
             <ChevronRight className="h-6 w-6" />
           </Button>
@@ -155,8 +155,8 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
       {/* Fullscreen Dialog */}
       <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
         <DialogContent className="max-w-[100vw] w-screen h-screen max-h-screen p-0 bg-neutral-900 border-none [&>button]:hidden">
-          <DialogTitle className="sr-only">Revista em Tela Cheia</DialogTitle>
-          <DialogDescription className="sr-only">Visualize a revista em modo de tela cheia</DialogDescription>
+          <DialogTitle className="sr-only">Full Screen Magazine</DialogTitle>
+          <DialogDescription className="sr-only">View the magazine in full-screen mode</DialogDescription>
 
           <div className="flex flex-col h-full">
             {/* Fullscreen Header */}
@@ -235,7 +235,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 {/* Back Cover */}
                 <Page className="bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center p-8">
                   <div className="text-center text-white/60">
-                    <p className="font-serif italic text-xl">Fim</p>
+                    <p className="font-serif italic text-xl">END</p>
                   </div>
                 </Page>
               </HTMLFlipBook>
@@ -248,7 +248,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 Anterior
               </Button>
 
-              <span className="text-white/60 text-sm">Clique nas bordas ou arraste para folhear</span>
+              <span className="text-white/60 text-sm">Click on the edges or drag to browse.</span>
 
               <Button variant="ghost" size="lg" onClick={handleNextPage} className="text-white hover:bg-neutral-700">
                 Próxima
