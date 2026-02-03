@@ -197,7 +197,7 @@ export default function NewsArticle() {
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Share2 className="h-4 w-4" />
-                Compartilhar:
+                Share:
               </span>
               <a
                 href={shareLinks.facebook}
