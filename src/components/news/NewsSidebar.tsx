@@ -124,7 +124,7 @@ export default function NewsSidebar() {
 
       {/* Markets */}
       <div className="news-sidebar">
-        <h2 className="text-lg font-bold mb-4">Mercados</h2>
+        <h2 className="text-lg font-bold mb-4">Markets</h2>
 
         {ratesLoading && rates.length === 0 ? (
           <div className="space-y-3">
