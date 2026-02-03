@@ -1,28 +1,28 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, Eye, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
-import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
-import NewsHeader from '@/components/news/NewsHeader';
-import NewsFooter from '@/components/news/NewsFooter';
-import NewsSidebar from '@/components/news/NewsSidebar';
-import { useArticles } from '@/hooks/useArticles';
-import type { Article } from '@/hooks/useArticles';
-import { Button } from '@/components/ui/button';
-import { MagazineFlipbook } from '@/components/magazine/MagazineFlipbook';
-import type { MagazineConfig, MagazinePage } from '@/types/magazine';
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { ArrowLeft, Clock, Eye, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
+import { format } from "date-fns";
+import { enUS } from "date-fns/locale";
+import NewsHeader from "@/components/news/NewsHeader";
+import NewsFooter from "@/components/news/NewsFooter";
+import NewsSidebar from "@/components/news/NewsSidebar";
+import { useArticles } from "@/hooks/useArticles";
+import type { Article } from "@/hooks/useArticles";
+import { Button } from "@/components/ui/button";
+import { MagazineFlipbook } from "@/components/magazine/MagazineFlipbook";
+import type { MagazineConfig, MagazinePage } from "@/types/magazine";
 
 const categoryLabels: Record<string, string> = {
-  culture_arts: 'Culture & Arts',
-  education: 'Education',
-  entrepreneurship_business: 'Entrepreneurship & Business',
-  society_humanity: 'Society & Humanity',
-  psychology_wellbeing: 'Psychology & Well-Being',
-  sustainability_future: 'Sustainability & Future',
-  lifestyle_purpose: 'Lifestyle with Purpose',
-  events: 'Events',
-  opinion_essays: 'Opinion & Essays',
-  biographies: 'Biographies',
+  culture_arts: "Culture & Arts",
+  education: "Education",
+  entrepreneurship_business: "Entrepreneurship & Business",
+  society_humanity: "Society & Humanity",
+  psychology_wellbeing: "Psychology & Well-Being",
+  sustainability_future: "Sustainability & Future",
+  lifestyle_purpose: "Lifestyle with Purpose",
+  events: "Events",
+  opinion_essays: "Opinion & Essays",
+  biographies: "Biographies",
 };
 
 export default function NewsArticle() {
@@ -49,12 +49,12 @@ export default function NewsArticle() {
     loadArticle();
   }, [id]);
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(article?.title || '')}`,
-    linkedin: `https://www.linkedin.com/shareArticle?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(article?.title || '')}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(article?.title || "")}`,
+    linkedin: `https://www.linkedin.com/shareArticle?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(article?.title || "")}`,
   };
 
   if (isLoading) {
@@ -106,7 +106,7 @@ export default function NewsArticle() {
   const hasMagazineContent = isMagazineLayout && magazinePages && magazinePages.length > 0;
 
   const magazineConfig: MagazineConfig = {
-    pages: magazinePages || []
+    pages: magazinePages || [],
   };
 
   // For magazine layout, render full-width
@@ -131,16 +131,10 @@ export default function NewsArticle() {
           </span>
 
           {/* Title */}
-          <h1 className="news-headline text-3xl md:text-4xl lg:text-5xl mb-4">
-            {article.title}
-          </h1>
+          <h1 className="news-headline text-3xl md:text-4xl lg:text-5xl mb-4">{article.title}</h1>
 
           {/* Subtitle */}
-          {article.subtitle && (
-            <p className="text-xl text-muted-foreground mb-6">
-              {article.subtitle}
-            </p>
-          )}
+          {article.subtitle && <p className="text-xl text-muted-foreground mb-6">{article.subtitle}</p>}
 
           {/* Meta info */}
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b border-border">
@@ -159,7 +153,7 @@ export default function NewsArticle() {
           <div className="flex items-center gap-3 mb-8">
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
               <Share2 className="h-4 w-4" />
-              Compartilhar:
+              Share:
             </span>
             <a
               href={shareLinks.facebook}
@@ -265,16 +259,10 @@ export default function NewsArticle() {
             </span>
 
             {/* Title */}
-            <h1 className="news-headline text-3xl md:text-4xl lg:text-5xl mb-4">
-              {article.title}
-            </h1>
+            <h1 className="news-headline text-3xl md:text-4xl lg:text-5xl mb-4">{article.title}</h1>
 
             {/* Subtitle */}
-            {article.subtitle && (
-              <p className="text-xl text-muted-foreground mb-6">
-                {article.subtitle}
-              </p>
-            )}
+            {article.subtitle && <p className="text-xl text-muted-foreground mb-6">{article.subtitle}</p>}
 
             {/* Meta info */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b border-border">
@@ -327,17 +315,13 @@ export default function NewsArticle() {
             {/* Featured image */}
             {article.main_image && (
               <figure className="mb-8">
-                <img
-                  src={article.main_image}
-                  alt={article.title}
-                  className="w-full rounded-lg"
-                />
+                <img src={article.main_image} alt={article.title} className="w-full rounded-lg" />
               </figure>
             )}
 
             {/* Article body */}
             <div className="prose prose-lg max-w-none">
-              {article.body.split('\n\n').map((paragraph, index) => (
+              {article.body.split("\n\n").map((paragraph, index) => (
                 <p key={index} className="text-foreground mb-4 leading-relaxed">
                   {paragraph}
                 </p>
