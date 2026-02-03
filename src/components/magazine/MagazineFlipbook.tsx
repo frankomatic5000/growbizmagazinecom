@@ -198,29 +198,29 @@ export function MagazineFlipbook({
               </Button>
             </div>
 
-            {/* Fullscreen Flipbook - takes all available space */}
+            {/* Fullscreen Flipbook - takes all available space, single page mode */}
             <div className="flex-1 flex items-center justify-center overflow-hidden">
               {/* @ts-ignore - react-pageflip types issue */}
               <HTMLFlipBook
                 ref={fullscreenBookRef}
-                width={Math.min(window.innerWidth * 0.45, 700)}
-                height={Math.min(window.innerHeight - 120, 900)}
-                size="stretch"
-                minWidth={300}
-                maxWidth={Math.min(window.innerWidth * 0.48, 800)}
-                minHeight={400}
-                maxHeight={window.innerHeight - 100}
+                width={Math.min(window.innerWidth * 0.6, 600)}
+                height={Math.min(window.innerHeight - 140, 850)}
+                size="fixed"
+                minWidth={400}
+                maxWidth={700}
+                minHeight={500}
+                maxHeight={900}
                 showCover={true}
                 mobileScrollSupport={true}
                 className="magazine-flipbook"
                 style={{}}
                 startPage={0}
                 drawShadow={true}
-                flippingTime={800}
+                flippingTime={600}
                 usePortrait={true}
                 startZIndex={0}
-                autoSize={true}
-                maxShadowOpacity={0.5}
+                autoSize={false}
+                maxShadowOpacity={0.4}
                 showPageCorners={true}
                 disableFlipByClick={false}
                 useMouseEvents={true}
