@@ -1,10 +1,10 @@
-import { useRef, useCallback, useState, forwardRef } from 'react';
-import HTMLFlipBook from 'react-pageflip';
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import type { MagazineConfig } from '@/types/magazine';
-import { MagazinePageRenderer } from './MagazinePageRenderer';
+import { useRef, useCallback, useState, forwardRef } from "react";
+import HTMLFlipBook from "react-pageflip";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import type { MagazineConfig } from "@/types/magazine";
+import { MagazinePageRenderer } from "./MagazinePageRenderer";
 
 interface MagazineFlipbookProps {
   config: MagazineConfig;
@@ -15,22 +15,17 @@ interface MagazineFlipbookProps {
 
 // Wrapper para as páginas - necessário para react-pageflip
 const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; className?: string }>(
-  ({ children, className = '' }, ref) => {
+  ({ children, className = "" }, ref) => {
     return (
       <div ref={ref} className={`magazine-page ${className}`}>
         {children}
       </div>
     );
-  }
+  },
 );
-Page.displayName = 'Page';
+Page.displayName = "Page";
 
-export function MagazineFlipbook({
-  config,
-  articleTitle,
-  articleSubtitle,
-  mainImage
-}: MagazineFlipbookProps) {
+export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainImage }: MagazineFlipbookProps) {
   const bookRef = useRef<any>(null);
   const fullscreenBookRef = useRef<any>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -65,9 +60,7 @@ export function MagazineFlipbook({
       <div className="bg-neutral-900 rounded-xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-neutral-800/60">
-          <span className="text-white/70 text-sm font-medium">
-            📖 Modo Revista
-          </span>
+          <span className="text-white/70 text-sm font-medium">📖 Modo Revista</span>
           <Button
             variant="ghost"
             size="sm"
@@ -123,13 +116,9 @@ export function MagazineFlipbook({
                   </>
                 ) : null}
                 <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-white text-center">
-                  <h1 className="text-xl md:text-2xl font-bold mb-3 font-serif leading-tight">
-                    {articleTitle}
-                  </h1>
+                  <h1 className="text-xl md:text-2xl font-bold mb-3 font-serif leading-tight">{articleTitle}</h1>
                   {articleSubtitle && (
-                    <p className="text-sm opacity-90 font-serif italic max-w-xs">
-                      {articleSubtitle}
-                    </p>
+                    <p className="text-sm opacity-90 font-serif italic max-w-xs">{articleSubtitle}</p>
                   )}
                 </div>
               </Page>
@@ -144,7 +133,7 @@ export function MagazineFlipbook({
               {/* Back Cover */}
               <Page className="bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center p-8">
                 <div className="text-center text-white/60">
-                  <p className="font-serif italic">Fim</p>
+                  <p className="font-serif italic">END</p>
                 </div>
               </Page>
             </HTMLFlipBook>
@@ -153,23 +142,11 @@ export function MagazineFlipbook({
 
         {/* Navigation Controls */}
         <div className="flex items-center justify-center gap-4 px-4 py-3 bg-neutral-800/60 border-t border-neutral-700">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handlePrevPage}
-            className="text-white hover:bg-neutral-700"
-          >
+          <Button variant="ghost" size="icon" onClick={handlePrevPage} className="text-white hover:bg-neutral-700">
             <ChevronLeft className="h-6 w-6" />
           </Button>
-          <span className="text-white/60 text-sm">
-            Clique nas bordas ou arraste para folhear
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleNextPage}
-            className="text-white hover:bg-neutral-700"
-          >
+          <span className="text-white/60 text-sm">Clique nas bordas ou arraste para folhear</span>
+          <Button variant="ghost" size="icon" onClick={handleNextPage} className="text-white hover:bg-neutral-700">
             <ChevronRight className="h-6 w-6" />
           </Button>
         </div>
@@ -180,13 +157,11 @@ export function MagazineFlipbook({
         <DialogContent className="max-w-[100vw] w-screen h-screen max-h-screen p-0 bg-neutral-900 border-none [&>button]:hidden">
           <DialogTitle className="sr-only">Revista em Tela Cheia</DialogTitle>
           <DialogDescription className="sr-only">Visualize a revista em modo de tela cheia</DialogDescription>
-          
+
           <div className="flex flex-col h-full">
             {/* Fullscreen Header */}
             <div className="flex items-center justify-between px-6 py-3 bg-neutral-800/80 shrink-0">
-              <h3 className="text-white font-medium truncate max-w-[60%]">
-                {articleTitle}
-              </h3>
+              <h3 className="text-white font-medium truncate max-w-[60%]">{articleTitle}</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -245,9 +220,7 @@ export function MagazineFlipbook({
                       {articleTitle}
                     </h1>
                     {articleSubtitle && (
-                      <p className="text-lg md:text-xl opacity-90 font-serif italic max-w-md">
-                        {articleSubtitle}
-                      </p>
+                      <p className="text-lg md:text-xl opacity-90 font-serif italic max-w-md">{articleSubtitle}</p>
                     )}
                   </div>
                 </Page>
@@ -270,26 +243,14 @@ export function MagazineFlipbook({
 
             {/* Fullscreen Navigation */}
             <div className="flex items-center justify-center gap-8 px-6 py-3 bg-neutral-800/80 shrink-0">
-              <Button
-                variant="ghost"
-                size="lg"
-                onClick={handlePrevPage}
-                className="text-white hover:bg-neutral-700"
-              >
+              <Button variant="ghost" size="lg" onClick={handlePrevPage} className="text-white hover:bg-neutral-700">
                 <ChevronLeft className="h-6 w-6 mr-2" />
                 Anterior
               </Button>
-              
-              <span className="text-white/60 text-sm">
-                Clique nas bordas ou arraste para folhear
-              </span>
-              
-              <Button
-                variant="ghost"
-                size="lg"
-                onClick={handleNextPage}
-                className="text-white hover:bg-neutral-700"
-              >
+
+              <span className="text-white/60 text-sm">Clique nas bordas ou arraste para folhear</span>
+
+              <Button variant="ghost" size="lg" onClick={handleNextPage} className="text-white hover:bg-neutral-700">
                 Próxima
                 <ChevronRight className="h-6 w-6 ml-2" />
               </Button>
