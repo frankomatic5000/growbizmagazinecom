@@ -177,13 +177,13 @@ export function MagazineFlipbook({
 
       {/* Fullscreen Dialog */}
       <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
-        <DialogContent className="max-w-[100vw] w-screen h-screen max-h-screen p-0 bg-neutral-900 border-none">
+        <DialogContent className="max-w-[100vw] w-screen h-screen max-h-screen p-0 bg-neutral-900 border-none [&>button]:hidden">
           <DialogTitle className="sr-only">Revista em Tela Cheia</DialogTitle>
           <DialogDescription className="sr-only">Visualize a revista em modo de tela cheia</DialogDescription>
           
           <div className="flex flex-col h-full">
             {/* Fullscreen Header */}
-            <div className="flex items-center justify-between px-6 py-4 bg-neutral-800/80">
+            <div className="flex items-center justify-between px-6 py-3 bg-neutral-800/80 shrink-0">
               <h3 className="text-white font-medium truncate max-w-[60%]">
                 {articleTitle}
               </h3>
@@ -198,80 +198,78 @@ export function MagazineFlipbook({
               </Button>
             </div>
 
-            {/* Fullscreen Flipbook */}
-            <div className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-hidden">
-              <div className="relative">
-                {/* @ts-ignore - react-pageflip types issue */}
-                <HTMLFlipBook
-                  ref={fullscreenBookRef}
-                  width={500}
-                  height={700}
-                  size="stretch"
-                  minWidth={400}
-                  maxWidth={700}
-                  minHeight={500}
-                  maxHeight={900}
-                  showCover={true}
-                  mobileScrollSupport={true}
-                  className="magazine-flipbook"
-                  style={{}}
-                  startPage={0}
-                  drawShadow={true}
-                  flippingTime={800}
-                  usePortrait={true}
-                  startZIndex={0}
-                  autoSize={true}
-                  maxShadowOpacity={0.5}
-                  showPageCorners={true}
-                  disableFlipByClick={false}
-                  useMouseEvents={true}
-                  swipeDistance={30}
-                  clickEventForward={true}
-                >
-                  {/* Cover Page */}
-                  <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
-                    {mainImage ? (
-                      <>
-                        <img
-                          src={mainImage}
-                          alt=""
-                          className="absolute inset-0 w-full h-full object-cover"
-                          draggable={false}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-                      </>
-                    ) : null}
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full p-8 text-white text-center">
-                      <h1 className="text-3xl md:text-4xl font-bold mb-4 font-serif leading-tight">
-                        {articleTitle}
-                      </h1>
-                      {articleSubtitle && (
-                        <p className="text-lg opacity-90 font-serif italic max-w-md">
-                          {articleSubtitle}
-                        </p>
-                      )}
-                    </div>
-                  </Page>
+            {/* Fullscreen Flipbook - takes all available space */}
+            <div className="flex-1 flex items-center justify-center overflow-hidden">
+              {/* @ts-ignore - react-pageflip types issue */}
+              <HTMLFlipBook
+                ref={fullscreenBookRef}
+                width={Math.min(window.innerWidth * 0.45, 700)}
+                height={Math.min(window.innerHeight - 120, 900)}
+                size="stretch"
+                minWidth={300}
+                maxWidth={Math.min(window.innerWidth * 0.48, 800)}
+                minHeight={400}
+                maxHeight={window.innerHeight - 100}
+                showCover={true}
+                mobileScrollSupport={true}
+                className="magazine-flipbook"
+                style={{}}
+                startPage={0}
+                drawShadow={true}
+                flippingTime={800}
+                usePortrait={true}
+                startZIndex={0}
+                autoSize={true}
+                maxShadowOpacity={0.5}
+                showPageCorners={true}
+                disableFlipByClick={false}
+                useMouseEvents={true}
+                swipeDistance={30}
+                clickEventForward={true}
+              >
+                {/* Cover Page */}
+                <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
+                  {mainImage ? (
+                    <>
+                      <img
+                        src={mainImage}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover"
+                        draggable={false}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+                    </>
+                  ) : null}
+                  <div className="relative z-10 flex flex-col items-center justify-center h-full p-8 text-white text-center">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-serif leading-tight">
+                      {articleTitle}
+                    </h1>
+                    {articleSubtitle && (
+                      <p className="text-lg md:text-xl opacity-90 font-serif italic max-w-md">
+                        {articleSubtitle}
+                      </p>
+                    )}
+                  </div>
+                </Page>
 
-                  {/* Content Pages */}
-                  {config.pages.map((page) => (
-                    <Page key={page.id} className="bg-white">
-                      <MagazinePageRenderer page={page} />
-                    </Page>
-                  ))}
-
-                  {/* Back Cover */}
-                  <Page className="bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center p-8">
-                    <div className="text-center text-white/60">
-                      <p className="font-serif italic">Fim</p>
-                    </div>
+                {/* Content Pages */}
+                {config.pages.map((page) => (
+                  <Page key={page.id} className="bg-white">
+                    <MagazinePageRenderer page={page} />
                   </Page>
-                </HTMLFlipBook>
-              </div>
+                ))}
+
+                {/* Back Cover */}
+                <Page className="bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center p-8">
+                  <div className="text-center text-white/60">
+                    <p className="font-serif italic text-xl">Fim</p>
+                  </div>
+                </Page>
+              </HTMLFlipBook>
             </div>
 
             {/* Fullscreen Navigation */}
-            <div className="flex items-center justify-center gap-8 px-6 py-4 bg-neutral-800/80">
+            <div className="flex items-center justify-center gap-8 px-6 py-3 bg-neutral-800/80 shrink-0">
               <Button
                 variant="ghost"
                 size="lg"
