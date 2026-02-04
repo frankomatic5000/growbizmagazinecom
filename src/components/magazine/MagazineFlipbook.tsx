@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, forwardRef, useEffect } from "react";
+import { useRef, useCallback, useState, forwardRef } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,21 +15,10 @@ interface MagazineFlipbookProps {
 }
 
 // Wrapper para as páginas - necessário para react-pageflip
-// Inclui otimizações de renderização para texto nítido (High-DPI)
 const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; className?: string }>(
   ({ children, className = "" }, ref) => {
     return (
-      <div 
-        ref={ref} 
-        className={`magazine-page ${className}`}
-        style={{
-          WebkitFontSmoothing: 'antialiased',
-          MozOsxFontSmoothing: 'grayscale',
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)',
-          willChange: 'transform',
-        }}
-      >
+      <div ref={ref} className={`magazine-page ${className}`}>
         {children}
       </div>
     );
@@ -41,44 +30,34 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   const bookRef = useRef<any>(null);
   const fullscreenBookRef = useRef<any>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
   const isMobile = useIsMobile();
 
-  // Sincronizar página ao mudar de modo
-  useEffect(() => {
-    if (isFullscreen && fullscreenBookRef.current?.pageFlip) {
-      const timer = setTimeout(() => {
-        try {
-          fullscreenBookRef.current?.pageFlip()?.turnToPage(currentPage);
-        } catch (e) {
-          // Ignorar erro se o flipbook ainda não estiver pronto
-        }
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isFullscreen, currentPage]);
-
-  const handleFlip = useCallback((e: any) => {
-    setCurrentPage(e.data);
-  }, []);
-
+  // Função de navegação que acessa diretamente a API do pageFlip
   const handlePrevPage = useCallback(() => {
-    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book) {
-      const pageFlip = book.pageFlip?.();
-      if (pageFlip) {
-        pageFlip.flipPrev('top');
+    try {
+      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+      if (book?.pageFlip) {
+        const pageFlip = book.pageFlip();
+        if (pageFlip && typeof pageFlip.flipPrev === 'function') {
+          pageFlip.flipPrev();
+        }
       }
+    } catch (e) {
+      console.error('Error flipping prev:', e);
     }
   }, [isFullscreen]);
 
   const handleNextPage = useCallback(() => {
-    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book) {
-      const pageFlip = book.pageFlip?.();
-      if (pageFlip) {
-        pageFlip.flipNext('top');
+    try {
+      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+      if (book?.pageFlip) {
+        const pageFlip = book.pageFlip();
+        if (pageFlip && typeof pageFlip.flipNext === 'function') {
+          pageFlip.flipNext();
+        }
       }
+    } catch (e) {
+      console.error('Error flipping next:', e);
     }
   }, [isFullscreen]);
 
@@ -93,31 +72,28 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   // Proporções A4: 210mm x 297mm = ratio 1:1.414
   const A4_RATIO = 1.414;
 
-  // Dimensões aumentadas para renderização High-DPI (texto mais nítido)
-  const HI_DPI_SCALE = 1.5;
-  
   const getRegularDimensions = () => {
     const maxWidth = Math.min(window.innerWidth * 0.8, 300);
-    const width = Math.floor(maxWidth * HI_DPI_SCALE);
-    const height = Math.floor(width * A4_RATIO);
-    return { width, height, scale: HI_DPI_SCALE };
+    const width = maxWidth;
+    const height = width * A4_RATIO;
+    return { width, height };
   };
 
   const getFullscreenDimensions = () => {
     if (isMobile) {
-      const availableHeight = window.innerHeight - 80;
+      // Mobile: calcular baseado na altura disponível
+      const availableHeight = window.innerHeight - 80; // Espaço para navegação
       const heightBasedWidth = availableHeight / A4_RATIO;
       const maxWidth = window.innerWidth - 24;
       const width = Math.min(heightBasedWidth, maxWidth);
       const height = width * A4_RATIO;
-      // No mobile, não aplicamos escala extra para performance
-      return { width: Math.floor(width), height: Math.floor(height), scale: 1 };
+      return { width: Math.floor(width), height: Math.floor(height) };
     }
+    // Desktop: baseado na altura
     const availableHeight = window.innerHeight - 120;
-    const baseWidth = Math.min(availableHeight / A4_RATIO, 500);
-    const width = Math.floor(baseWidth * HI_DPI_SCALE);
-    const height = Math.floor(width * A4_RATIO);
-    return { width, height, scale: HI_DPI_SCALE };
+    const width = Math.min(availableHeight / A4_RATIO, 500);
+    const height = width * A4_RATIO;
+    return { width: Math.floor(width), height: Math.floor(height) };
   };
 
   const regularDims = getRegularDimensions();
@@ -143,13 +119,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
         {/* Flipbook Container */}
         <div className="flex items-center justify-center py-6 px-2 overflow-hidden">
-          <div 
-            className="relative"
-            style={{
-              transform: regularDims.scale !== 1 ? `scale(${1 / regularDims.scale})` : undefined,
-              transformOrigin: 'center center',
-            }}
-          >
+          <div className="relative">
             {/* @ts-ignore - react-pageflip types issue */}
             <HTMLFlipBook
               ref={bookRef}
@@ -157,26 +127,25 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               height={regularDims.height}
               size="fixed"
               minWidth={200}
-              maxWidth={600}
+              maxWidth={400}
               minHeight={280}
-              maxHeight={900}
+              maxHeight={600}
               showCover={true}
               mobileScrollSupport={false}
-              className="magazine-flipbook hi-dpi-flipbook"
+              className="magazine-flipbook no-page-flip"
               style={{}}
               startPage={0}
-              drawShadow={!isMobile}
+              drawShadow={true}
               flippingTime={600}
               usePortrait={true}
               startZIndex={0}
               autoSize={false}
-              maxShadowOpacity={isMobile ? 0 : 0.5}
+              maxShadowOpacity={0.5}
               showPageCorners={false}
               disableFlipByClick={true}
               useMouseEvents={false}
-              swipeDistance={0}
-              clickEventForward={true}
-              onFlip={handleFlip}
+              swipeDistance={30000}
+              clickEventForward={false}
             >
               {/* Cover Page */}
               <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
@@ -218,21 +187,11 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
         {/* Navigation Controls */}
         <div className="flex items-center justify-center gap-4 px-4 py-3 bg-secondary/80 border-t border-border">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handlePrevPage}
-            className="text-secondary-foreground hover:bg-secondary-foreground/10"
-          >
+          <Button variant="ghost" size="icon" onClick={handlePrevPage} className="text-secondary-foreground hover:bg-secondary-foreground/10">
             <ChevronLeft className="h-6 w-6" />
           </Button>
           <span className="text-secondary-foreground/60 text-sm">Use as setas para navegar</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleNextPage}
-            className="text-secondary-foreground hover:bg-secondary-foreground/10"
-          >
+          <Button variant="ghost" size="icon" onClick={handleNextPage} className="text-secondary-foreground hover:bg-secondary-foreground/10">
             <ChevronRight className="h-6 w-6" />
           </Button>
         </div>
@@ -273,13 +232,8 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               </Button>
             )}
 
-            <div 
-              className="flex-1 flex items-center justify-center overflow-hidden px-2"
-              style={{
-                transform: fullscreenDims.scale !== 1 ? `scale(${1 / fullscreenDims.scale})` : undefined,
-                transformOrigin: 'center center',
-              }}
-            >
+            {/* Fullscreen Flipbook */}
+            <div className="flex-1 flex items-center justify-center overflow-hidden px-2">
               {/* @ts-ignore - react-pageflip types issue */}
               <HTMLFlipBook
                 ref={fullscreenBookRef}
@@ -287,26 +241,25 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 height={fullscreenDims.height}
                 size="fixed"
                 minWidth={200}
-                maxWidth={900}
+                maxWidth={600}
                 minHeight={280}
-                maxHeight={1300}
+                maxHeight={900}
                 showCover={true}
                 mobileScrollSupport={false}
-                className="magazine-flipbook hi-dpi-flipbook"
+                className="magazine-flipbook no-page-flip"
                 style={{}}
-                startPage={currentPage}
+                startPage={0}
                 drawShadow={!isMobile}
                 flippingTime={500}
                 usePortrait={true}
                 startZIndex={0}
                 autoSize={false}
-                maxShadowOpacity={isMobile ? 0 : 0.4}
+                maxShadowOpacity={isMobile ? 0.2 : 0.4}
                 showPageCorners={false}
                 disableFlipByClick={true}
                 useMouseEvents={false}
-                swipeDistance={0}
-                clickEventForward={true}
-                onFlip={handleFlip}
+                swipeDistance={30000}
+                clickEventForward={false}
               >
                 {/* Cover Page */}
                 <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
@@ -348,25 +301,25 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
             </div>
 
             {/* Fullscreen Navigation - compacto no mobile */}
-            <div
-              className={`flex items-center justify-center gap-4 md:gap-8 px-4 md:px-6 py-2 md:py-3 bg-secondary/80 shrink-0 ${isMobile ? "safe-area-bottom" : ""}`}
-            >
-              <Button
-                variant="ghost"
-                size={isMobile ? "icon" : "lg"}
-                onClick={handlePrevPage}
+            <div className={`flex items-center justify-center gap-4 md:gap-8 px-4 md:px-6 py-2 md:py-3 bg-secondary/80 shrink-0 ${isMobile ? 'safe-area-bottom' : ''}`}>
+              <Button 
+                variant="ghost" 
+                size={isMobile ? "icon" : "lg"} 
+                onClick={handlePrevPage} 
                 className="text-secondary-foreground hover:bg-secondary-foreground/10"
               >
                 <ChevronLeft className="h-6 w-6" />
                 {!isMobile && <span className="ml-2">Anterior</span>}
               </Button>
 
-              {!isMobile && <span className="text-secondary-foreground/60 text-sm">Use as setas para navegar</span>}
+              {!isMobile && (
+                <span className="text-secondary-foreground/60 text-sm">Use as setas para navegar</span>
+              )}
 
-              <Button
-                variant="ghost"
-                size={isMobile ? "icon" : "lg"}
-                onClick={handleNextPage}
+              <Button 
+                variant="ghost" 
+                size={isMobile ? "icon" : "lg"} 
+                onClick={handleNextPage} 
                 className="text-secondary-foreground hover:bg-secondary-foreground/10"
               >
                 {!isMobile && <span className="mr-2">Próxima</span>}
