@@ -78,15 +78,15 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
             {/* @ts-ignore - react-pageflip types issue */}
             <HTMLFlipBook
               ref={bookRef}
-              width={320}
-              height={450}
-              size="stretch"
-              minWidth={300}
-              maxWidth={500}
-              minHeight={400}
-              maxHeight={700}
+              width={Math.min(window.innerWidth * 0.85, 320)}
+              height={Math.min(window.innerHeight * 0.6, 450)}
+              size="fixed"
+              minWidth={280}
+              maxWidth={400}
+              minHeight={380}
+              maxHeight={550}
               showCover={true}
-              mobileScrollSupport={true}
+              mobileScrollSupport={false}
               className="magazine-flipbook"
               style={{}}
               startPage={0}
@@ -94,13 +94,13 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               flippingTime={800}
               usePortrait={true}
               startZIndex={0}
-              autoSize={true}
+              autoSize={false}
               maxShadowOpacity={0.5}
-              showPageCorners={true}
-              disableFlipByClick={false}
-              useMouseEvents={true}
-              swipeDistance={30}
-              clickEventForward={true}
+              showPageCorners={false}
+              disableFlipByClick={true}
+              useMouseEvents={false}
+              swipeDistance={0}
+              clickEventForward={false}
             >
               {/* Cover Page */}
               <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
@@ -178,15 +178,15 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               {/* @ts-ignore - react-pageflip types issue */}
               <HTMLFlipBook
                 ref={fullscreenBookRef}
-                width={Math.min(window.innerWidth * 0.6, 600)}
+                width={Math.min(window.innerWidth * 0.9, 600)}
                 height={Math.min(window.innerHeight - 140, 850)}
                 size="fixed"
-                minWidth={400}
+                minWidth={280}
                 maxWidth={700}
-                minHeight={500}
+                minHeight={400}
                 maxHeight={900}
                 showCover={true}
-                mobileScrollSupport={true}
+                mobileScrollSupport={false}
                 className="magazine-flipbook"
                 style={{}}
                 startPage={0}
@@ -196,11 +196,11 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 startZIndex={0}
                 autoSize={false}
                 maxShadowOpacity={0.4}
-                showPageCorners={true}
-                disableFlipByClick={false}
-                useMouseEvents={true}
-                swipeDistance={30}
-                clickEventForward={true}
+                showPageCorners={false}
+                disableFlipByClick={true}
+                useMouseEvents={false}
+                swipeDistance={0}
+                clickEventForward={false}
               >
                 {/* Cover Page */}
                 <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
