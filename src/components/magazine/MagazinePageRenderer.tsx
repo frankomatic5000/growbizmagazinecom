@@ -4,10 +4,15 @@ import type { MagazinePage, MagazineImage } from '@/types/magazine';
 
 interface MagazinePageRendererProps {
   page: MagazinePage;
+  isFullscreen?: boolean;
 }
 
-export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
+export function MagazinePageRenderer({ page, isFullscreen = false }: MagazinePageRendererProps) {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  
+  const scrollContainerClass = isFullscreen 
+    ? "overflow-auto pointer-events-auto touch-auto" 
+    : "overflow-auto";
 
   const getImageByPosition = (position: MagazineImage['position']) => {
     return page.images.find(img => img.position === position);
@@ -81,7 +86,7 @@ export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
             <div className="h-full">
               {renderImage(mainImage, 'h-full')}
             </div>
-            <div className="p-6 overflow-auto">
+            <div className={`p-6 ${scrollContainerClass}`}>
               <div className="prose prose-sm max-w-none">
                 {paragraphs.map((p, i) => (
                   <p key={i} className="font-serif leading-relaxed mb-4 text-sm">
@@ -98,7 +103,7 @@ export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
         const mainImage = getImageByPosition('main');
         return (
           <div className="grid grid-cols-2 h-full" style={pageStyle}>
-            <div className="p-6 overflow-auto">
+            <div className={`p-6 ${scrollContainerClass}`}>
               <div className="prose prose-sm max-w-none">
                 {paragraphs.map((p, i) => (
                   <p key={i} className="font-serif leading-relaxed mb-4 text-sm">
@@ -123,7 +128,7 @@ export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
               {renderImage(mainImage, 'h-full rounded')}
               {renderImage(secondaryImage, 'h-full rounded')}
             </div>
-            <div className="flex-1 p-4 pt-0 overflow-auto">
+            <div className={`flex-1 p-4 pt-0 ${scrollContainerClass}`}>
               <div className="prose prose-sm max-w-none">
                 {paragraphs.map((p, i) => (
                   <p key={i} className="font-serif leading-relaxed mb-3 text-sm">
@@ -143,7 +148,7 @@ export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
             <div className="h-2/5">
               {renderImage(mainImage, 'h-full')}
             </div>
-            <div className="flex-1 p-6 overflow-auto">
+            <div className={`flex-1 p-6 ${scrollContainerClass}`}>
               <div className="prose prose-sm max-w-none">
                 {paragraphs.map((p, i) => (
                   <p key={i} className="font-serif leading-relaxed mb-4 text-sm">
@@ -158,7 +163,7 @@ export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
 
       case 'text-only': {
         return (
-          <div className="h-full p-8 overflow-auto" style={pageStyle}>
+          <div className={`h-full p-8 ${scrollContainerClass}`} style={pageStyle}>
             <div className="prose prose-sm max-w-none">
               {paragraphs.map((p, i) => (
                 <p key={i} className="font-serif leading-relaxed mb-4 text-sm">
@@ -188,7 +193,7 @@ export function MagazinePageRenderer({ page }: MagazinePageRendererProps) {
                 </div>
               ))}
             </div>
-            <div className="flex-1 p-4 pt-0 overflow-auto">
+            <div className={`flex-1 p-4 pt-0 ${scrollContainerClass}`}>
               <div className="prose prose-sm max-w-none">
                 {paragraphs.map((p, i) => (
                   <p key={i} className="font-serif leading-relaxed mb-3 text-xs">
