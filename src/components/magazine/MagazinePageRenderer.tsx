@@ -10,9 +10,8 @@ interface MagazinePageRendererProps {
 export function MagazinePageRenderer({ page, isFullscreen = false }: MagazinePageRendererProps) {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   
-  const scrollContainerClass = isFullscreen 
-    ? "overflow-auto pointer-events-auto touch-auto" 
-    : "overflow-auto";
+  // Classes para container com scroll - funciona tanto em modo normal quanto fullscreen
+  const scrollContainerClass = "overflow-y-auto overflow-x-hidden overscroll-contain";
 
   const getImageByPosition = (position: MagazineImage['position']) => {
     return page.images.find(img => img.position === position);
@@ -213,10 +212,10 @@ export function MagazinePageRenderer({ page, isFullscreen = false }: MagazinePag
 
   return (
     <>
-      <div className="w-full h-full overflow-hidden">
+      <div className="w-full h-full overflow-y-auto overflow-x-hidden overscroll-contain">
         {renderContent()}
         {/* Page number */}
-        <div className="absolute bottom-2 right-3 text-xs text-muted-foreground font-mono">
+        <div className="absolute bottom-2 right-3 text-xs text-muted-foreground font-mono pointer-events-none">
           {page.pageNumber}
         </div>
       </div>
