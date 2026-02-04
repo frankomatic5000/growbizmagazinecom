@@ -259,13 +259,8 @@
     -webkit-user-select: none;
   }
 
-  .magazine-flipbook.pointer-events-none {
-    pointer-events: none;
-  }
-
   .magazine-flipbook .stf__wrapper {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(0, 0, 0, 0.2);
-    pointer-events: none;
   }
 
   .magazine-page {
@@ -274,7 +269,16 @@
     box-shadow: inset -1px 0 3px rgba(0, 0, 0, 0.03);
     user-select: none;
     -webkit-user-select: none;
-    pointer-events: none;
+  }
+
+  /* Allow scrolling inside page content */
+  .magazine-page.page-with-scroll {
+    overflow: visible;
+  }
+
+  .magazine-page.page-with-scroll > div {
+    pointer-events: auto;
+    touch-action: auto;
   }
 
   .magazine-page[data-density="hard"] {

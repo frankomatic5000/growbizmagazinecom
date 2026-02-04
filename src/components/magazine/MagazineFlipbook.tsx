@@ -1,10 +1,11 @@
-import { useRef, useCallback, useState, forwardRef, useEffect } from "react";
+import { useRef, useCallback, useState, forwardRef } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import type { MagazineConfig } from "@/types/magazine";
 import { MagazinePageRenderer } from "./MagazinePageRenderer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MagazineFlipbookProps {
   config: MagazineConfig;
@@ -24,20 +25,6 @@ const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; className?:
   },
 );
 Page.displayName = "Page";
-
-// Hook para detectar mobile
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  
-  return isMobile;
-}
 
 export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainImage }: MagazineFlipbookProps) {
   const bookRef = useRef<any>(null);
@@ -130,7 +117,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               maxHeight={600}
               showCover={true}
               mobileScrollSupport={false}
-              className="magazine-flipbook pointer-events-none"
+              className="magazine-flipbook"
               style={{}}
               startPage={0}
               drawShadow={true}
@@ -141,7 +128,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               maxShadowOpacity={0.5}
               showPageCorners={false}
               disableFlipByClick={true}
-              useMouseEvents={false}
+              useMouseEvents={true}
               swipeDistance={0}
               clickEventForward={false}
             >
@@ -168,8 +155,8 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
               {/* Content Pages */}
               {config.pages.map((page) => (
-                <Page key={page.id} className="bg-background">
-                  <MagazinePageRenderer page={page} />
+                <Page key={page.id} className="bg-background page-with-scroll">
+                  <MagazinePageRenderer page={page} isFullscreen={false} />
                 </Page>
               ))}
 
@@ -244,7 +231,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 maxHeight={900}
                 showCover={true}
                 mobileScrollSupport={false}
-                className="magazine-flipbook pointer-events-none"
+                className="magazine-flipbook"
                 style={{}}
                 startPage={0}
                 drawShadow={!isMobile}
@@ -255,7 +242,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 maxShadowOpacity={isMobile ? 0.2 : 0.4}
                 showPageCorners={false}
                 disableFlipByClick={true}
-                useMouseEvents={false}
+                useMouseEvents={true}
                 swipeDistance={0}
                 clickEventForward={false}
               >
@@ -284,8 +271,8 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
                 {/* Content Pages */}
                 {config.pages.map((page) => (
-                  <Page key={page.id} className="bg-background">
-                    <MagazinePageRenderer page={page} />
+                  <Page key={page.id} className="bg-background page-with-scroll">
+                    <MagazinePageRenderer page={page} isFullscreen={true} />
                   </Page>
                 ))}
 
