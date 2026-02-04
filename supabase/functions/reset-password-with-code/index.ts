@@ -13,6 +13,41 @@ interface ResetPasswordRequest {
   newPassword: string;
 }
 
+// Rate limiting for brute-force protection
+const rateLimitMap = new Map<string, { count: number; resetTime: number; blocked: boolean }>();
+const RATE_LIMIT_MAX = 5; // Max 5 attempts per window
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const BLOCK_DURATION_MS = 60 * 60 * 1000; // 1 hour block after exceeded
+
+function checkRateLimit(identifier: string): { allowed: boolean; remainingAttempts: number } {
+  const now = Date.now();
+  const entry = rateLimitMap.get(identifier);
+  
+  if (entry?.blocked && now < entry.resetTime) {
+    return { allowed: false, remainingAttempts: 0 };
+  }
+  
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS, blocked: false });
+    return { allowed: true, remainingAttempts: RATE_LIMIT_MAX - 1 };
+  }
+  
+  if (entry.count >= RATE_LIMIT_MAX) {
+    entry.blocked = true;
+    entry.resetTime = now + BLOCK_DURATION_MS;
+    return { allowed: false, remainingAttempts: 0 };
+  }
+  
+  entry.count++;
+  return { allowed: true, remainingAttempts: RATE_LIMIT_MAX - entry.count };
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+         req.headers.get("x-real-ip") || 
+         "unknown";
+}
+
 Deno.serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -20,8 +55,11 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const clientIP = getClientIP(req);
+    
     const { email, code, newPassword }: ResetPasswordRequest = await req.json();
 
+    // Input validation
     if (!email || !code || !newPassword) {
       return new Response(
         JSON.stringify({ error: "Email, código e nova senha são obrigatórios" }),
@@ -29,10 +67,51 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    if (newPassword.length < 6) {
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || email.length > 255) {
       return new Response(
-        JSON.stringify({ error: "A senha deve ter pelo menos 6 caracteres" }),
+        JSON.stringify({ error: "Formato de email inválido" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate code format
+    if (!/^\d{6}$/.test(code)) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Formato de código inválido" }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate password strength
+    if (newPassword.length < 8) {
+      return new Response(
+        JSON.stringify({ error: "A senha deve ter pelo menos 8 caracteres" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (newPassword.length > 72) {
+      return new Response(
+        JSON.stringify({ error: "A senha não pode ter mais de 72 caracteres" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Rate limit check with email-specific key
+    const rateLimitKey = `${clientIP}:${email}`;
+    const { allowed, remainingAttempts } = checkRateLimit(rateLimitKey);
+    
+    if (!allowed) {
+      console.warn(`Rate limit exceeded for password reset: ${rateLimitKey}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Muitas tentativas incorretas. Aguarde uma hora.",
+          blocked: true 
+        }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
@@ -61,8 +140,13 @@ Deno.serve(async (req: Request) => {
     }
 
     if (!codeData) {
+      console.log(`Invalid reset code attempt for ${email}, remaining: ${remainingAttempts}`);
       return new Response(
-        JSON.stringify({ success: false, error: "Código inválido ou expirado" }),
+        JSON.stringify({ 
+          success: false, 
+          error: "Código inválido ou expirado",
+          remainingAttempts 
+        }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
@@ -86,6 +170,9 @@ Deno.serve(async (req: Request) => {
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+
+    // Clear rate limit on success
+    rateLimitMap.delete(rateLimitKey);
 
     console.log("Password reset successfully for:", email);
 
