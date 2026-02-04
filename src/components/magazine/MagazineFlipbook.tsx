@@ -46,18 +46,16 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   const isMobile = useIsMobile();
 
   const handlePrevPage = useCallback(() => {
-    if (isFullscreen) {
-      fullscreenBookRef.current?.pageFlip()?.flipPrev();
-    } else {
-      bookRef.current?.pageFlip()?.flipPrev();
+    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+    if (book && book.pageFlip) {
+      book.pageFlip().flipPrev();
     }
   }, [isFullscreen]);
 
   const handleNextPage = useCallback(() => {
-    if (isFullscreen) {
-      fullscreenBookRef.current?.pageFlip()?.flipNext();
-    } else {
-      bookRef.current?.pageFlip()?.flipNext();
+    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+    if (book && book.pageFlip) {
+      book.pageFlip().flipNext();
     }
   }, [isFullscreen]);
 
@@ -69,24 +67,31 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
     );
   }
 
-  // Calcular dimensões responsivas
+  // Proporções A4: 210mm x 297mm = ratio 1:1.414
+  const A4_RATIO = 1.414;
+
   const getRegularDimensions = () => {
-    const width = Math.min(window.innerWidth * 0.85, 320);
-    const height = Math.min(window.innerHeight * 0.55, 450);
+    const maxWidth = Math.min(window.innerWidth * 0.8, 300);
+    const width = maxWidth;
+    const height = width * A4_RATIO;
     return { width, height };
   };
 
   const getFullscreenDimensions = () => {
     if (isMobile) {
-      // Mobile: ocupar toda a tela disponível
-      const width = window.innerWidth - 16; // 8px de margem em cada lado
-      const height = window.innerHeight - 100; // Espaço para navegação
-      return { width, height };
+      // Mobile: calcular baseado na altura disponível
+      const availableHeight = window.innerHeight - 80; // Espaço para navegação
+      const heightBasedWidth = availableHeight / A4_RATIO;
+      const maxWidth = window.innerWidth - 24;
+      const width = Math.min(heightBasedWidth, maxWidth);
+      const height = width * A4_RATIO;
+      return { width: Math.floor(width), height: Math.floor(height) };
     }
-    // Desktop
-    const width = Math.min(window.innerWidth * 0.6, 600);
-    const height = Math.min(window.innerHeight - 140, 850);
-    return { width, height };
+    // Desktop: baseado na altura
+    const availableHeight = window.innerHeight - 120;
+    const width = Math.min(availableHeight / A4_RATIO, 500);
+    const height = width * A4_RATIO;
+    return { width: Math.floor(width), height: Math.floor(height) };
   };
 
   const regularDims = getRegularDimensions();
@@ -119,24 +124,24 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               width={regularDims.width}
               height={regularDims.height}
               size="fixed"
-              minWidth={260}
+              minWidth={200}
               maxWidth={400}
-              minHeight={350}
-              maxHeight={550}
+              minHeight={280}
+              maxHeight={600}
               showCover={true}
               mobileScrollSupport={false}
-              className="magazine-flipbook"
+              className="magazine-flipbook pointer-events-none"
               style={{}}
               startPage={0}
               drawShadow={true}
-              flippingTime={800}
+              flippingTime={600}
               usePortrait={true}
               startZIndex={0}
               autoSize={false}
               maxShadowOpacity={0.5}
               showPageCorners={false}
               disableFlipByClick={true}
-              useMouseEvents={true}
+              useMouseEvents={false}
               swipeDistance={0}
               clickEventForward={false}
             >
@@ -233,24 +238,24 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 width={fullscreenDims.width}
                 height={fullscreenDims.height}
                 size="fixed"
-                minWidth={260}
-                maxWidth={800}
-                minHeight={350}
-                maxHeight={1000}
+                minWidth={200}
+                maxWidth={600}
+                minHeight={280}
+                maxHeight={900}
                 showCover={true}
                 mobileScrollSupport={false}
-                className="magazine-flipbook"
+                className="magazine-flipbook pointer-events-none"
                 style={{}}
                 startPage={0}
                 drawShadow={!isMobile}
-                flippingTime={600}
+                flippingTime={500}
                 usePortrait={true}
                 startZIndex={0}
                 autoSize={false}
                 maxShadowOpacity={isMobile ? 0.2 : 0.4}
                 showPageCorners={false}
                 disableFlipByClick={true}
-                useMouseEvents={true}
+                useMouseEvents={false}
                 swipeDistance={0}
                 clickEventForward={false}
               >
