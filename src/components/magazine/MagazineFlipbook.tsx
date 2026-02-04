@@ -26,6 +26,13 @@ const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; className?:
 );
 Page.displayName = "Page";
 
+// Wrapper para conteúdo com scroll
+const ScrollableContent = ({ children }: { children: React.ReactNode }) => (
+  <div className="h-full w-full overflow-y-auto overscroll-contain custom-scrollbar">
+    {children}
+  </div>
+);
+
 export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainImage }: MagazineFlipbookProps) {
   const bookRef = useRef<any>(null);
   const fullscreenBookRef = useRef<any>(null);
@@ -33,36 +40,49 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   const [currentPage, setCurrentPage] = useState(0);
   const isMobile = useIsMobile();
 
-  // Sincronizar página ao mudar de modo
+  // Sincronizar página ao mudar de modo - preserva currentPage entre modos
   useEffect(() => {
-    if (isFullscreen && fullscreenBookRef.current?.pageFlip) {
-      // Aguardar o flipbook fullscreen estar pronto
+    if (isFullscreen && fullscreenBookRef.current) {
       const timer = setTimeout(() => {
         try {
-          fullscreenBookRef.current?.pageFlip()?.turnToPage(currentPage);
+          const flipbook = fullscreenBookRef.current?.pageFlip?.();
+          if (flipbook && typeof flipbook.turnToPage === 'function') {
+            flipbook.turnToPage(currentPage);
+          }
         } catch (e) {
-          // Ignorar erro se o flipbook ainda não estiver pronto
+          console.warn('Flipbook sync error:', e);
         }
-      }, 100);
+      }, 150);
       return () => clearTimeout(timer);
     }
-  }, [isFullscreen, currentPage]);
+  }, [isFullscreen]);
 
   const handleFlip = useCallback((e: any) => {
     setCurrentPage(e.data);
   }, []);
 
+  // Navegação programática - funciona independentemente de useMouseEvents
   const handlePrevPage = useCallback(() => {
-    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book?.pageFlip) {
-      book.pageFlip().flipPrev();
+    try {
+      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+      const flipbook = book?.pageFlip?.();
+      if (flipbook && typeof flipbook.flipPrev === 'function') {
+        flipbook.flipPrev();
+      }
+    } catch (e) {
+      console.warn('Navigation error:', e);
     }
   }, [isFullscreen]);
 
   const handleNextPage = useCallback(() => {
-    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book?.pageFlip) {
-      book.pageFlip().flipNext();
+    try {
+      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+      const flipbook = book?.pageFlip?.();
+      if (flipbook && typeof flipbook.flipNext === 'function') {
+        flipbook.flipNext();
+      }
+    } catch (e) {
+      console.warn('Navigation error:', e);
     }
   }, [isFullscreen]);
 
@@ -148,9 +168,9 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               maxShadowOpacity={0.5}
               showPageCorners={false}
               disableFlipByClick={true}
-              useMouseEvents={true}
+              useMouseEvents={false}
               swipeDistance={0}
-              clickEventForward={false}
+              clickEventForward={true}
               onFlip={handleFlip}
             >
               {/* Cover Page */}
@@ -176,8 +196,10 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
               {/* Content Pages */}
               {config.pages.map((page) => (
-                <Page key={page.id} className="bg-background page-with-scroll">
-                  <MagazinePageRenderer page={page} isFullscreen={false} />
+                <Page key={page.id} className="bg-background">
+                  <ScrollableContent>
+                    <MagazinePageRenderer page={page} isFullscreen={false} />
+                  </ScrollableContent>
                 </Page>
               ))}
 
@@ -262,9 +284,9 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 maxShadowOpacity={isMobile ? 0.2 : 0.4}
                 showPageCorners={false}
                 disableFlipByClick={true}
-                useMouseEvents={true}
+                useMouseEvents={false}
                 swipeDistance={0}
-                clickEventForward={false}
+                clickEventForward={true}
                 onFlip={handleFlip}
               >
                 {/* Cover Page */}
@@ -292,8 +314,10 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
                 {/* Content Pages */}
                 {config.pages.map((page) => (
-                  <Page key={page.id} className="bg-background page-with-scroll">
-                    <MagazinePageRenderer page={page} isFullscreen={true} />
+                  <Page key={page.id} className="bg-background">
+                    <ScrollableContent>
+                      <MagazinePageRenderer page={page} isFullscreen={true} />
+                    </ScrollableContent>
                   </Page>
                 ))}
 
