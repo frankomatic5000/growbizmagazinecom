@@ -32,17 +32,32 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isMobile = useIsMobile();
 
+  // Função de navegação que acessa diretamente a API do pageFlip
   const handlePrevPage = useCallback(() => {
-    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book && book.pageFlip) {
-      book.pageFlip().flipPrev();
+    try {
+      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+      if (book?.pageFlip) {
+        const pageFlip = book.pageFlip();
+        if (pageFlip && typeof pageFlip.flipPrev === 'function') {
+          pageFlip.flipPrev();
+        }
+      }
+    } catch (e) {
+      console.error('Error flipping prev:', e);
     }
   }, [isFullscreen]);
 
   const handleNextPage = useCallback(() => {
-    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book && book.pageFlip) {
-      book.pageFlip().flipNext();
+    try {
+      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+      if (book?.pageFlip) {
+        const pageFlip = book.pageFlip();
+        if (pageFlip && typeof pageFlip.flipNext === 'function') {
+          pageFlip.flipNext();
+        }
+      }
+    } catch (e) {
+      console.error('Error flipping next:', e);
     }
   }, [isFullscreen]);
 
@@ -117,7 +132,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               maxHeight={600}
               showCover={true}
               mobileScrollSupport={false}
-              className="magazine-flipbook"
+              className="magazine-flipbook no-page-flip"
               style={{}}
               startPage={0}
               drawShadow={true}
@@ -128,8 +143,8 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               maxShadowOpacity={0.5}
               showPageCorners={false}
               disableFlipByClick={true}
-              useMouseEvents={true}
-              swipeDistance={0}
+              useMouseEvents={false}
+              swipeDistance={30000}
               clickEventForward={false}
             >
               {/* Cover Page */}
@@ -231,7 +246,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 maxHeight={900}
                 showCover={true}
                 mobileScrollSupport={false}
-                className="magazine-flipbook"
+                className="magazine-flipbook no-page-flip"
                 style={{}}
                 startPage={0}
                 drawShadow={!isMobile}
@@ -242,8 +257,8 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 maxShadowOpacity={isMobile ? 0.2 : 0.4}
                 showPageCorners={false}
                 disableFlipByClick={true}
-                useMouseEvents={true}
-                swipeDistance={0}
+                useMouseEvents={false}
+                swipeDistance={30000}
                 clickEventForward={false}
               >
                 {/* Cover Page */}
