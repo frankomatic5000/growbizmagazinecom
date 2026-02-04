@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, forwardRef } from "react";
+import { useRef, useCallback, useState, forwardRef, useEffect } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,34 +30,39 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   const bookRef = useRef<any>(null);
   const fullscreenBookRef = useRef<any>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
   const isMobile = useIsMobile();
 
-  // Função de navegação que acessa diretamente a API do pageFlip
-  const handlePrevPage = useCallback(() => {
-    try {
-      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-      if (book?.pageFlip) {
-        const pageFlip = book.pageFlip();
-        if (pageFlip && typeof pageFlip.flipPrev === 'function') {
-          pageFlip.flipPrev();
+  // Sincronizar página ao mudar de modo
+  useEffect(() => {
+    if (isFullscreen && fullscreenBookRef.current?.pageFlip) {
+      // Aguardar o flipbook fullscreen estar pronto
+      const timer = setTimeout(() => {
+        try {
+          fullscreenBookRef.current?.pageFlip()?.turnToPage(currentPage);
+        } catch (e) {
+          // Ignorar erro se o flipbook ainda não estiver pronto
         }
-      }
-    } catch (e) {
-      console.error('Error flipping prev:', e);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isFullscreen, currentPage]);
+
+  const handleFlip = useCallback((e: any) => {
+    setCurrentPage(e.data);
+  }, []);
+
+  const handlePrevPage = useCallback(() => {
+    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+    if (book?.pageFlip) {
+      book.pageFlip().flipPrev();
     }
   }, [isFullscreen]);
 
   const handleNextPage = useCallback(() => {
-    try {
-      const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-      if (book?.pageFlip) {
-        const pageFlip = book.pageFlip();
-        if (pageFlip && typeof pageFlip.flipNext === 'function') {
-          pageFlip.flipNext();
-        }
-      }
-    } catch (e) {
-      console.error('Error flipping next:', e);
+    const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
+    if (book?.pageFlip) {
+      book.pageFlip().flipNext();
     }
   }, [isFullscreen]);
 
@@ -132,7 +137,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               maxHeight={600}
               showCover={true}
               mobileScrollSupport={false}
-              className="magazine-flipbook no-page-flip"
+              className="magazine-flipbook"
               style={{}}
               startPage={0}
               drawShadow={true}
@@ -143,9 +148,10 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               maxShadowOpacity={0.5}
               showPageCorners={false}
               disableFlipByClick={true}
-              useMouseEvents={false}
-              swipeDistance={30000}
+              useMouseEvents={true}
+              swipeDistance={0}
               clickEventForward={false}
+              onFlip={handleFlip}
             >
               {/* Cover Page */}
               <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
@@ -232,7 +238,6 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               </Button>
             )}
 
-            {/* Fullscreen Flipbook */}
             <div className="flex-1 flex items-center justify-center overflow-hidden px-2">
               {/* @ts-ignore - react-pageflip types issue */}
               <HTMLFlipBook
@@ -246,9 +251,9 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 maxHeight={900}
                 showCover={true}
                 mobileScrollSupport={false}
-                className="magazine-flipbook no-page-flip"
+                className="magazine-flipbook"
                 style={{}}
-                startPage={0}
+                startPage={currentPage}
                 drawShadow={!isMobile}
                 flippingTime={500}
                 usePortrait={true}
@@ -257,9 +262,10 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 maxShadowOpacity={isMobile ? 0.2 : 0.4}
                 showPageCorners={false}
                 disableFlipByClick={true}
-                useMouseEvents={false}
-                swipeDistance={30000}
+                useMouseEvents={true}
+                swipeDistance={0}
                 clickEventForward={false}
+                onFlip={handleFlip}
               >
                 {/* Cover Page */}
                 <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">

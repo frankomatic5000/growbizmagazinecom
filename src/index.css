@@ -259,9 +259,13 @@
     -webkit-user-select: none;
   }
 
-  /* Disable all page flip interactions except navigation buttons */
-  .magazine-flipbook.no-page-flip .stf__wrapper {
+  .magazine-flipbook .stf__wrapper {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Disable page flip by dragging on the page itself */
+  .magazine-flipbook .stf__item {
+    pointer-events: none;
   }
 
   .magazine-page {
@@ -270,6 +274,7 @@
     box-shadow: inset -1px 0 3px rgba(0, 0, 0, 0.03);
     user-select: text;
     -webkit-user-select: text;
+    pointer-events: none;
   }
 
   /* Allow scrolling inside page content */
