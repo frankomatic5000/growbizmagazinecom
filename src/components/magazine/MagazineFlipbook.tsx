@@ -15,10 +15,21 @@ interface MagazineFlipbookProps {
 }
 
 // Wrapper para as páginas - necessário para react-pageflip
+// Inclui otimizações de renderização para texto nítido (High-DPI)
 const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; className?: string }>(
   ({ children, className = "" }, ref) => {
     return (
-      <div ref={ref} className={`magazine-page ${className}`}>
+      <div 
+        ref={ref} 
+        className={`magazine-page ${className}`}
+        style={{
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+        }}
+      >
         {children}
       </div>
     );
@@ -53,15 +64,21 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
   const handlePrevPage = useCallback(() => {
     const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book?.pageFlip) {
-      book.pageFlip().flipPrev();
+    if (book) {
+      const pageFlip = book.pageFlip?.();
+      if (pageFlip) {
+        pageFlip.flipPrev('top');
+      }
     }
   }, [isFullscreen]);
 
   const handleNextPage = useCallback(() => {
     const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
-    if (book?.pageFlip) {
-      book.pageFlip().flipNext();
+    if (book) {
+      const pageFlip = book.pageFlip?.();
+      if (pageFlip) {
+        pageFlip.flipNext('top');
+      }
     }
   }, [isFullscreen]);
 
@@ -76,11 +93,14 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   // Proporções A4: 210mm x 297mm = ratio 1:1.414
   const A4_RATIO = 1.414;
 
+  // Dimensões aumentadas para renderização High-DPI (texto mais nítido)
+  const HI_DPI_SCALE = 1.5;
+  
   const getRegularDimensions = () => {
     const maxWidth = Math.min(window.innerWidth * 0.8, 300);
-    const width = maxWidth;
-    const height = width * A4_RATIO;
-    return { width, height };
+    const width = Math.floor(maxWidth * HI_DPI_SCALE);
+    const height = Math.floor(width * A4_RATIO);
+    return { width, height, scale: HI_DPI_SCALE };
   };
 
   const getFullscreenDimensions = () => {
@@ -90,12 +110,14 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
       const maxWidth = window.innerWidth - 24;
       const width = Math.min(heightBasedWidth, maxWidth);
       const height = width * A4_RATIO;
-      return { width: Math.floor(width), height: Math.floor(height) };
+      // No mobile, não aplicamos escala extra para performance
+      return { width: Math.floor(width), height: Math.floor(height), scale: 1 };
     }
     const availableHeight = window.innerHeight - 120;
-    const width = Math.min(availableHeight / A4_RATIO, 500);
-    const height = width * A4_RATIO;
-    return { width: Math.floor(width), height: Math.floor(height) };
+    const baseWidth = Math.min(availableHeight / A4_RATIO, 500);
+    const width = Math.floor(baseWidth * HI_DPI_SCALE);
+    const height = Math.floor(width * A4_RATIO);
+    return { width, height, scale: HI_DPI_SCALE };
   };
 
   const regularDims = getRegularDimensions();
@@ -121,7 +143,13 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
 
         {/* Flipbook Container */}
         <div className="flex items-center justify-center py-6 px-2 overflow-hidden">
-          <div className="relative">
+          <div 
+            className="relative"
+            style={{
+              transform: regularDims.scale !== 1 ? `scale(${1 / regularDims.scale})` : undefined,
+              transformOrigin: 'center center',
+            }}
+          >
             {/* @ts-ignore - react-pageflip types issue */}
             <HTMLFlipBook
               ref={bookRef}
@@ -129,25 +157,25 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               height={regularDims.height}
               size="fixed"
               minWidth={200}
-              maxWidth={400}
+              maxWidth={600}
               minHeight={280}
-              maxHeight={600}
+              maxHeight={900}
               showCover={true}
               mobileScrollSupport={false}
-              className="magazine-flipbook"
+              className="magazine-flipbook hi-dpi-flipbook"
               style={{}}
               startPage={0}
-              drawShadow={true}
+              drawShadow={!isMobile}
               flippingTime={600}
               usePortrait={true}
               startZIndex={0}
               autoSize={false}
-              maxShadowOpacity={0.5}
+              maxShadowOpacity={isMobile ? 0 : 0.5}
               showPageCorners={false}
               disableFlipByClick={true}
-              useMouseEvents={false} // AJUSTADO: permite cliques nas setas
+              useMouseEvents={false}
               swipeDistance={0}
-              clickEventForward={true} // AJUSTADO: encaminha eventos
+              clickEventForward={true}
               onFlip={handleFlip}
             >
               {/* Cover Page */}
@@ -245,7 +273,13 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               </Button>
             )}
 
-            <div className="flex-1 flex items-center justify-center overflow-hidden px-2">
+            <div 
+              className="flex-1 flex items-center justify-center overflow-hidden px-2"
+              style={{
+                transform: fullscreenDims.scale !== 1 ? `scale(${1 / fullscreenDims.scale})` : undefined,
+                transformOrigin: 'center center',
+              }}
+            >
               {/* @ts-ignore - react-pageflip types issue */}
               <HTMLFlipBook
                 ref={fullscreenBookRef}
@@ -253,12 +287,12 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 height={fullscreenDims.height}
                 size="fixed"
                 minWidth={200}
-                maxWidth={600}
+                maxWidth={900}
                 minHeight={280}
-                maxHeight={900}
+                maxHeight={1300}
                 showCover={true}
                 mobileScrollSupport={false}
-                className="magazine-flipbook"
+                className="magazine-flipbook hi-dpi-flipbook"
                 style={{}}
                 startPage={currentPage}
                 drawShadow={!isMobile}
@@ -266,12 +300,12 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 usePortrait={true}
                 startZIndex={0}
                 autoSize={false}
-                maxShadowOpacity={isMobile ? 0.2 : 0.4}
+                maxShadowOpacity={isMobile ? 0 : 0.4}
                 showPageCorners={false}
                 disableFlipByClick={true}
-                useMouseEvents={false} // AJUSTADO: permite cliques nas setas
+                useMouseEvents={false}
                 swipeDistance={0}
-                clickEventForward={true} // AJUSTADO: encaminha eventos
+                clickEventForward={true}
                 onFlip={handleFlip}
               >
                 {/* Cover Page */}

@@ -257,6 +257,20 @@
     @apply mx-auto;
     user-select: none;
     -webkit-user-select: none;
+    pointer-events: auto;
+  }
+
+  /* High-DPI rendering improvements for crisp text */
+  .hi-dpi-flipbook {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  .hi-dpi-flipbook .magazine-page {
+    image-rendering: -webkit-optimize-contrast;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   .magazine-flipbook .stf__wrapper {
