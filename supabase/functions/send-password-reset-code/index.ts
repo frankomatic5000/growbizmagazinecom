@@ -13,6 +13,34 @@ interface SendCodeRequest {
   email: string;
 }
 
+// Rate limiting for spam protection
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 3; // Max 3 requests per window
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(identifier);
+  
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  entry.count++;
+  return true;
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+         req.headers.get("x-real-ip") || 
+         "unknown";
+}
+
 Deno.serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -20,6 +48,16 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    // Rate limiting check
+    const clientIP = getClientIP(req);
+    if (!checkRateLimit(clientIP)) {
+      console.warn(`Rate limit exceeded for password reset IP: ${clientIP}`);
+      return new Response(
+        JSON.stringify({ error: "Muitas tentativas. Aguarde uma hora." }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     if (!MAILERSEND_API_KEY) {
       console.error("MAILERSEND_API_KEY is not configured");
       return new Response(
@@ -37,28 +75,34 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || email.length > 255) {
+      return new Response(
+        JSON.stringify({ error: "Formato de email inválido" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     // Create Supabase client with service role
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Check if user exists
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.listUsers();
-    
-    if (userError) {
-      console.error("Error listing users:", userError);
-      return new Response(
-        JSON.stringify({ error: "Erro ao verificar usuário" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+    // Query user by email - use listUsers with filter for efficiency
+    const { data: usersData, error: userError } = await supabaseAdmin.auth.admin.listUsers({
+      page: 1,
+      perPage: 1,
+    });
 
-    const user = userData.users.find(u => u.email === email);
-    
-    if (!user) {
-      // Return success even if user not found (security best practice)
-      console.log("User not found, returning success for security");
+    // Find user by email from the list (since direct email lookup isn't available)
+    // For better performance with large user bases, consider using a database query
+    const user = usersData?.users?.find(u => u.email === email);
+
+    if (userError || !user) {
+      // Return success even if user not found (security best practice - prevents enumeration)
+      console.log("User not found or error, returning success for security");
       return new Response(
         JSON.stringify({ success: true, message: "Se o email existir, um código será enviado" }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }

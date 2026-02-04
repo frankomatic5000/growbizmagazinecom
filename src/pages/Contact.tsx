@@ -18,6 +18,7 @@ const contactSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   phone: z.string().max(20).optional(),
   message: z.string().min(10, "Message must be at least 10 characters").max(2000),
+  website: z.string().max(0, "Bot detected").optional(), // Honeypot field
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -32,10 +33,22 @@ const Contact = () => {
       email: "",
       phone: "",
       message: "",
+      website: "", // Honeypot default
     },
   });
 
   const onSubmit = async (data: ContactFormData) => {
+    // Honeypot check - if filled, silently reject
+    if (data.website && data.website.length > 0) {
+      // Fake success to not alert bots
+      toast({
+        title: "Message sent!",
+        description: "Thank you for reaching out. We'll respond soon.",
+      });
+      form.reset();
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error } = await supabase.from("contact_messages").insert({
@@ -188,6 +201,20 @@ const Contact = () => {
                                 <Input type="tel" placeholder="+1 (555) 000-0000" {...field} className="bg-background" />
                               </FormControl>
                               <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Honeypot field - hidden from users, bots will fill it */}
+                        <FormField
+                          control={form.control}
+                          name="website"
+                          render={({ field }) => (
+                            <FormItem className="absolute left-[-9999px] opacity-0 h-0 w-0 overflow-hidden" aria-hidden="true" tabIndex={-1}>
+                              <FormLabel>Website</FormLabel>
+                              <FormControl>
+                                <Input type="text" autoComplete="off" tabIndex={-1} {...field} />
+                              </FormControl>
                             </FormItem>
                           )}
                         />

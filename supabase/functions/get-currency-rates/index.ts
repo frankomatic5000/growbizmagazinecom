@@ -6,6 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+// Secret key for cron job authentication
+const CRON_SECRET = Deno.env.get("CRON_SECRET") || "default-cron-secret-change-me";
+
 interface CurrencyRate {
   name: string;
   code: string;
@@ -13,6 +16,16 @@ interface CurrencyRate {
   previous_value: number | null;
   change: number;
   last_update: string;
+}
+
+// Rate limiting for update requests
+const updateRateLimitMap = new Map<string, number>();
+const UPDATE_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes between updates
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+         req.headers.get("x-real-ip") || 
+         "unknown";
 }
 
 serve(async (req) => {
@@ -25,11 +38,33 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Check if this is an update request (from cron) or just a read request
+    // Check if this is an update request
     const url = new URL(req.url);
     const isUpdate = url.searchParams.get('update') === 'true';
+    const cronSecret = req.headers.get('x-cron-secret');
 
     if (isUpdate) {
+      // Verify cron secret for update requests
+      if (cronSecret !== CRON_SECRET) {
+        // For non-cron requests, apply rate limiting
+        const clientIP = getClientIP(req);
+        const lastUpdate = updateRateLimitMap.get(clientIP);
+        const now = Date.now();
+        
+        if (lastUpdate && now - lastUpdate < UPDATE_COOLDOWN_MS) {
+          console.warn(`Update rate limit exceeded for IP: ${clientIP}`);
+          return new Response(
+            JSON.stringify({ error: "Aguarde alguns minutos entre atualizações" }),
+            { 
+              status: 429,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+        
+        updateRateLimitMap.set(clientIP, now);
+      }
+      
       // Fetch fresh rates from external APIs
       console.log('Fetching fresh rates from external APIs...');
       
@@ -123,10 +158,6 @@ serve(async (req) => {
     // If no rates in database yet, fetch and store them
     if (!rates || rates.length === 0) {
       console.log('No rates in database, fetching initial data...');
-      
-      // Redirect to update mode
-      const updateUrl = new URL(req.url);
-      updateUrl.searchParams.set('update', 'true');
       
       // Fetch forex rates
       const forexResponse = await fetch(
