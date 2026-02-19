@@ -59,7 +59,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
           const currentPage = pageFlip.getCurrentPageIndex();
           const totalPages = pageFlip.getPageCount();
           if (currentPage < totalPages - 1) {
-            pageFlip.flipNext('BOTTOM');
+            pageFlip.flip(currentPage + 1, 'BOTTOM');
           }
         }
       }
