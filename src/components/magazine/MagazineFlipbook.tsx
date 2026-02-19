@@ -38,8 +38,11 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
       const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
       if (book?.pageFlip) {
         const pageFlip = book.pageFlip();
-        if (pageFlip && typeof pageFlip.flipPrev === 'function') {
-          pageFlip.flipPrev();
+        if (pageFlip) {
+          const currentPage = pageFlip.getCurrentPageIndex();
+          if (currentPage > 0) {
+            pageFlip.flip(currentPage - 1, 'BOTTOM');
+          }
         }
       }
     } catch (e) {
@@ -52,8 +55,12 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
       const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
       if (book?.pageFlip) {
         const pageFlip = book.pageFlip();
-        if (pageFlip && typeof pageFlip.flipNext === 'function') {
-          pageFlip.flipNext();
+        if (pageFlip) {
+          const currentPage = pageFlip.getCurrentPageIndex();
+          const totalPages = pageFlip.getPageCount();
+          if (currentPage < totalPages - 1) {
+            pageFlip.flipNext('BOTTOM');
+          }
         }
       }
     } catch (e) {
