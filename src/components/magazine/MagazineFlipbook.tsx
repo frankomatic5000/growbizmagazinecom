@@ -30,26 +30,25 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
   const bookRef = useRef<any>(null);
   const fullscreenBookRef = useRef<any>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const currentPageRef = useRef<number>(0);
   const isMobile = useIsMobile();
 
-  // ✅ FIXED: Using flip(index) directly instead of flipPrev/flipNext
-  // which are unreliable with showCover=true in react-pageflip
   const handlePrevPage = useCallback(() => {
     try {
       const book = isFullscreen ? fullscreenBookRef.current : bookRef.current;
       if (book?.pageFlip) {
         const pageFlip = book.pageFlip();
         if (pageFlip) {
-          const current = pageFlip.getCurrentPageIndex();
+          const current = currentPageRef.current;
           if (current > 0) {
-            pageFlip.flip(current - 1, "BOTTOM");
-            setCurrentPageIndex(current - 1);
+            const target = current - 1;
+            currentPageRef.current = target;
+            pageFlip.turnToPage(target);
           }
         }
       }
     } catch (e) {
-      console.error("Error flipping prev:", e);
+      console.error('Error flipping prev:', e);
     }
   }, [isFullscreen]);
 
@@ -59,16 +58,17 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
       if (book?.pageFlip) {
         const pageFlip = book.pageFlip();
         if (pageFlip) {
-          const current = pageFlip.getCurrentPageIndex();
+          const current = currentPageRef.current;
           const total = pageFlip.getPageCount();
           if (current < total - 1) {
-            pageFlip.flip(current + 1, "BOTTOM");
-            setCurrentPageIndex(current + 1);
+            const target = current + 1;
+            currentPageRef.current = target;
+            pageFlip.turnToPage(target);
           }
         }
       }
     } catch (e) {
-      console.error("Error flipping next:", e);
+      console.error('Error flipping next:', e);
     }
   }, [isFullscreen]);
 
@@ -155,6 +155,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
               useMouseEvents={false}
               swipeDistance={30000}
               clickEventForward={false}
+              onFlip={(e: any) => { currentPageRef.current = e.data; }}
             >
               {/* Cover Page */}
               <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
@@ -279,6 +280,7 @@ export function MagazineFlipbook({ config, articleTitle, articleSubtitle, mainIm
                 useMouseEvents={false}
                 swipeDistance={30000}
                 clickEventForward={false}
+                onFlip={(e: any) => { currentPageRef.current = e.data; }}
               >
                 {/* Cover Page */}
                 <Page className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80">
