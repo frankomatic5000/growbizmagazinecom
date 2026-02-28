@@ -180,11 +180,17 @@ export function useArticles() {
 
   const searchArticles = async (query: string): Promise<Article[]> => {
     try {
+      // Sanitize input: escape SQL LIKE pattern characters and enforce length limits
+      const sanitized = query.replace(/[%_\\]/g, '\\$&').trim();
+      if (sanitized.length < 2 || sanitized.length > 100) {
+        return [];
+      }
+
       const { data, error: searchError } = await supabase
         .from('articles')
         .select('*')
         .eq('is_published', true)
-        .or(`title.ilike.%${query}%,subtitle.ilike.%${query}%,body.ilike.%${query}%`)
+        .or(`title.ilike.%${sanitized}%,subtitle.ilike.%${sanitized}%,body.ilike.%${sanitized}%`)
         .order('created_at', { ascending: false })
         .limit(20);
 
