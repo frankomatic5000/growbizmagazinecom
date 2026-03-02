@@ -1,9 +1,11 @@
+"use client";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Search, Menu, X, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import logoGrowbiz from "@/assets/logo-growbiz.jpg";
+import Image from "next/image";
 
 const categories = [
   { name: "Culture & Arts", path: "/category/culture_arts" },
@@ -18,16 +20,16 @@ const categories = [
   { name: "Biographies", path: "/category/biographies" },
 ];
 
-export default function NewsHeader() {
+export function NewsHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setIsSearchOpen(false);
     }
@@ -55,13 +57,20 @@ export default function NewsHeader() {
       <div className="news-container py-4 bg-black">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
-            <img src={logoGrowbiz} alt="GrowBiz - A Global Media of Virtues" className="h-24 md:h-30 w-auto" />
+          <Link href="/" className="flex-shrink-0">
+            <Image
+              src="/logo-growbiz.jpg"
+              alt="GrowBiz - A Global Media of Virtues"
+              width={240}
+              height={96}
+              className="h-24 md:h-28 w-auto object-contain"
+              priority
+            />
           </Link>
 
           {/* Search bar - Desktop */}
           <div className="hidden md:flex items-center flex-1 max-w-md mx-4 gap-2">
-            <Link to="/">
+            <Link href="/">
               <Button variant="ghost" size="icon" className="shrink-0 text-white hover:text-white hover:bg-white/10">
                 <Home className="h-5 w-5" />
               </Button>
@@ -89,7 +98,7 @@ export default function NewsHeader() {
 
           {/* Mobile controls */}
           <div className="flex items-center gap-1 md:hidden">
-            <Link to="/">
+            <Link href="/">
               <Button variant="ghost" size="icon" className="text-white hover:text-white hover:bg-white/10">
                 <Home className="h-5 w-5" />
               </Button>
@@ -141,12 +150,11 @@ export default function NewsHeader() {
       {/* Navigation */}
       <nav className="border-t border-white/10 bg-black">
         <div className="news-container">
-          {/* Desktop nav */}
           <ul className="hidden md:flex items-center gap-1 py-2 overflow-x-auto">
             {categories.map((category) => (
               <li key={category.path}>
                 <Link
-                  to={category.path}
+                  href={category.path}
                   className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 rounded transition-colors whitespace-nowrap"
                 >
                   {category.name}
@@ -155,13 +163,12 @@ export default function NewsHeader() {
             ))}
           </ul>
 
-          {/* Mobile nav */}
           {isMenuOpen && (
             <ul className="md:hidden py-4 space-y-1">
               {categories.map((category) => (
                 <li key={category.path}>
                   <Link
-                    to={category.path}
+                    href={category.path}
                     onClick={() => setIsMenuOpen(false)}
                     className="block px-4 py-3 text-base font-medium text-white hover:text-white hover:bg-white/10 rounded transition-colors"
                   >

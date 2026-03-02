@@ -1,21 +1,19 @@
-import { Newspaper } from 'lucide-react';
+import { FileQuestion } from "lucide-react";
 
 interface EmptyStateProps {
   title?: string;
   description?: string;
 }
 
-export default function EmptyState({
-  title = 'No articles found',
-  description = 'No articles have been published yet. Check back soon for the latest updates.',
+export function EmptyState({
+  title = "No articles found",
+  description = "Check back soon for new content.",
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
-        <Newspaper className="w-10 h-10 text-muted-foreground" />
-      </div>
-      <h2 className="text-xl font-semibold text-foreground mb-2">{title}</h2>
-      <p className="text-muted-foreground max-w-md">{description}</p>
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <FileQuestion className="h-16 w-16 text-muted-foreground/40 mb-4" />
+      <h2 className="text-xl font-semibold mb-2">{title}</h2>
+      <p className="text-muted-foreground max-w-sm">{description}</p>
     </div>
   );
 }

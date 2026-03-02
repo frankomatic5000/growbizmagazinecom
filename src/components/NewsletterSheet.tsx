@@ -1,93 +1,57 @@
+"use client";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-interface NewsletterSheetProps {
-  children: React.ReactNode;
-}
-
-const NewsletterSheet = ({ children }: NewsletterSheetProps) => {
+export function NewsletterBanner() {
   const [email, setEmail] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Newsletter signup:", email);
-    // Reset and close
-    setEmail("");
-    setIsOpen(false);
+    if (!email.includes("@")) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        toast.success("Subscribed! Welcome to GrowBiz Magazine.");
+        setEmail("");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent side="right" className="w-[100vw] md:w-[50vw] overflow-y-auto">
-        <div className="flex flex-col h-full">
-          {/* Content */}
-          <div className="flex-grow flex flex-col justify-center px-4 pb-12 pt-12">
-            <div className="w-full max-w-[880px] mx-auto">
-              {/* Title */}
-              <h2 className="font-display text-[3.6rem] md:text-[4.8rem] font-semibold leading-[1.1] mb-8">
-                Newsletter
-              </h2>
-
-              {/* Description */}
-              <p className="text-[1.6rem] md:text-[1.8rem] text-muted-foreground leading-relaxed mb-12">
-                Sign up to receive stories, photography insights, and updates on new work delivered directly to your inbox.
-              </p>
-
-              {/* Form */}
-              <form onSubmit={handleSubmit}>
-                <label
-                  htmlFor="newsletter-email"
-                  className="block text-[1.4rem] font-medium text-foreground mb-3"
-                >
-                  Email
-                </label>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <input
-                    type="email"
-                    id="newsletter-email"
-                    name="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="flex-1 px-6 py-4 text-[1.6rem] border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  />
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="px-12 py-4 text-[1.6rem] font-medium bg-foreground text-background hover:bg-primary hover:text-background transition-all duration-300 rounded-lg md:w-auto whitespace-nowrap"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </form>
-
-              {/* Footer note */}
-              <p className="text-[1.3rem] text-muted-foreground leading-relaxed mt-8">
-                You may unsubscribe at any time. By submitting information, you accept our{" "}
-                <Link
-                  to="/privacy-policy"
-                  className="text-foreground underline underline-offset-2 hover:text-primary transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Privacy Policy
-                </Link>
-                .
-              </p>
-            </div>
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+    <section className="bg-secondary text-secondary-foreground py-10">
+      <div className="news-container text-center">
+        <h2 className="font-serif text-2xl md:text-3xl font-bold mb-2">
+          Subscribe to GrowBiz Magazine
+        </h2>
+        <p className="text-secondary-foreground/80 mb-6 max-w-md mx-auto">
+          Get stories that reveal meaning, beauty, and depth — delivered to your inbox.
+        </p>
+        <form onSubmit={handleSubmit} className="flex gap-2 max-w-sm mx-auto">
+          <Input
+            type="email"
+            placeholder="Your email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-white/60"
+          />
+          <Button type="submit" disabled={loading}>
+            {loading ? "…" : "Subscribe"}
+          </Button>
+        </form>
+      </div>
+    </section>
   );
-};
-
-export default NewsletterSheet;
+}

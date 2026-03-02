@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Instagram } from "lucide-react";
 
 const footerLinks = {
@@ -16,23 +16,21 @@ const footerLinks = {
     { name: "Entrepreneurship & Business", path: "/category/entrepreneurship_business" },
     { name: "Society & Humanity", path: "/category/society_humanity" },
   ],
-  legal: [
-    { name: "Privacy Policy", path: "/privacy-policy" },
-  ],
+  legal: [{ name: "Privacy Policy", path: "/privacy-policy" }],
 };
 
 const socialLinks = [
   { name: "Instagram", icon: Instagram, url: "https://instagram.com/growbizmagazine" },
 ];
 
-export default function NewsFooter() {
+export function NewsFooter() {
   return (
     <footer className="bg-black text-white mt-12">
       <div className="news-container py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <Link to="/" className="inline-block mb-4">
+            <Link href="/" className="inline-block mb-4">
               <div className="flex flex-col items-center">
                 <h2 className="text-2xl font-serif font-semibold tracking-tight text-primary">GrowBiz</h2>
                 <span className="text-[9px] font-sans font-medium tracking-[0.15em] text-white/60 uppercase">
@@ -41,9 +39,9 @@ export default function NewsFooter() {
               </div>
             </Link>
             <p className="text-white/70 text-sm mb-4">
-              Your trusted source for stories that reveal meaning, beauty, and depth. Covering inspiring journeys from around the world with credibility and sensitivity.
+              Your trusted source for stories that reveal meaning, beauty, and depth. Covering inspiring
+              journeys from around the world with credibility and sensitivity.
             </p>
-            {/* Social Links */}
             <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a
@@ -66,7 +64,7 @@ export default function NewsFooter() {
             <ul className="space-y-2">
               {footerLinks.institutional.map((link) => (
                 <li key={link.path}>
-                  <Link to={link.path} className="text-white/70 hover:text-primary transition-colors text-sm">
+                  <Link href={link.path} className="text-white/70 hover:text-primary transition-colors text-sm">
                     {link.name}
                   </Link>
                 </li>
@@ -80,7 +78,7 @@ export default function NewsFooter() {
             <ul className="space-y-2">
               {footerLinks.categories.map((link) => (
                 <li key={link.path}>
-                  <Link to={link.path} className="text-white/70 hover:text-primary transition-colors text-sm">
+                  <Link href={link.path} className="text-white/70 hover:text-primary transition-colors text-sm">
                     {link.name}
                   </Link>
                 </li>
@@ -94,7 +92,7 @@ export default function NewsFooter() {
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.path}>
-                  <Link to={link.path} className="text-white/70 hover:text-primary transition-colors text-sm">
+                  <Link href={link.path} className="text-white/70 hover:text-primary transition-colors text-sm">
                     {link.name}
                   </Link>
                 </li>
@@ -103,7 +101,6 @@ export default function NewsFooter() {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-white/60">
           <p>© {new Date().getFullYear()} GrowBiz. All rights reserved.</p>
         </div>
